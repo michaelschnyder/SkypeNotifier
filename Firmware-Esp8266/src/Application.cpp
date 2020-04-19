@@ -9,12 +9,24 @@ Application::Application() {
 
 void Application::bootstrap() {
   
+  tft.initR(INITR_GREENTAB);
+
+  tft.setRotation(3);
+  tft.fillScreen(ST7735_BLACK);
+
+  tft.setCursor(0, 0);
+  tft.setTextColor(ST7735_WHITE);
+  tft.setTextWrap(true);
+  tft.print("Application is starting...");
+
   setGeneratedDeviceId();
   startupBanner();
-  initializeFileSystem();
 
+  tft.print("Init FS and load config...");
+  initializeFileSystem();
   config.load();
 
+  tft.print("Connecting to Wifi... ");
   setupWifi();
 
   if (!connectToWifi()) {
@@ -23,7 +35,11 @@ void Application::bootstrap() {
     ESP.reset();
   }
   
+  tft.print("OK");
+  delay(500);
   remoteUpdater.setup(deviceId);
+
+  tft.fillScreen(ST7735_BLACK);
 }
 
 void Application::loop() {
