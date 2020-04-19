@@ -1,0 +1,3 @@
+[submodule "SkypeClient"]
+	path = SkypeClient
+	url = https://github.com/MichaelSchnyder/SkypeClient

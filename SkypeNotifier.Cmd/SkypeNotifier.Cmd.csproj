@@ -11,9 +11,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Skype.Client.CefSharp.OffScreen\Skype.Client.CefSharp.OffScreen.csproj" />
-    <ProjectReference Include="..\Skype.Client.CefSharp\Skype.Client.CefSharp.csproj" />
-    <ProjectReference Include="..\Skype.Client\Skype.Client.csproj" />
+    <ProjectReference Include="..\SkypeClient\Skype.Client.CefSharp.OffScreen\Skype.Client.CefSharp.OffScreen.csproj" />
   </ItemGroup>
 
 </Project>
