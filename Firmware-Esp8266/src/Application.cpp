@@ -17,12 +17,12 @@ void Application::bootstrap() {
   tft.setCursor(0, 0);
   tft.setTextColor(ST7735_WHITE);
   tft.setTextWrap(true);
-  tft.print("Application is starting...");
+  tft.println("Application is starting...");
 
   setGeneratedDeviceId();
   startupBanner();
 
-  tft.print("Init FS and load config...");
+  tft.println("Init FS and load config...");
   initializeFileSystem();
   config.load();
 
@@ -35,10 +35,12 @@ void Application::bootstrap() {
     ESP.reset();
   }
   
-  tft.print("OK");
-  delay(500);
+  tft.println("OK");
+  
+  tft.println("IP: " + WiFi.localIP().toString());
   remoteUpdater.setup(deviceId);
 
+  delay(1000);
   tft.fillScreen(ST7735_BLACK);
 }
 
