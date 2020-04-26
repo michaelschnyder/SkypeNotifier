@@ -10,6 +10,9 @@
 #include <Adafruit_GFX.h>      // include Adafruit graphics library
 #include <Adafruit_ST7735.h>   // include Adafruit ST7735 TFT library
 
+#include <ESPAsyncTCP.h>
+#include "ESPAsyncWebServer.h"
+
 // ST7735 TFT module connections
 #define TFT_RST   2     // TFT RST pin is connected to NodeMCU pin D4 (GPIO2)
 #define TFT_CS    0     // TFT CS  pin is connected to NodeMCU pin D4 (GPIO0)
@@ -27,6 +30,7 @@ private:
 
     log4Esp::Logger logger = log4Esp::Logger("Application");
     Adafruit_ST7735 tft = Adafruit_ST7735(TFT_CS, TFT_DC, TFT_RST);
+    AsyncWebServer server = AsyncWebServer(80);  
 
     char deviceId[10];
     void setupWifi();

@@ -2,6 +2,25 @@
 
 int const ONE_SECOND_IN_MS = 1000;
 int wifiConnectionTimeoutInMs = 10 * ONE_SECOND_IN_MS;
+unsigned long lastHeartbeat = 0;
+
+bool heartBeatOk = true;
+
+enum DisplayState { idle, offline, ringing, active, missed };
+
+DisplayState desiredDisplayState = idle;
+DisplayState lastprocessedDisplayState = idle;
+
+#define Blue16  0xF800
+#define Red16  0x001F
+#define Green16 0x07E0
+
+#define DarkRed16 0x15
+#define DarkBlue16 0xB0DD
+#define DarkGreen16 0x316
+#define PureOrange16 0x412
+
+#define bgr(r, b, g) (b << 10) + (g << 5) + r
 
 Application::Application() {
   
@@ -40,8 +59,38 @@ void Application::bootstrap() {
   tft.println("IP: " + WiFi.localIP().toString());
   remoteUpdater.setup(deviceId);
 
+  // respond to GET requests on URL /heap
+  server.on("/status", HTTP_GET, [](AsyncWebServerRequest *request){
+    request->send(200, "text/plain", "Ready");
+  });
+
+  server.on("/heartbeat", HTTP_GET, [this](AsyncWebServerRequest *request){
+    request->send(200, "text/plain");
+    lastHeartbeat = millis();    
+  });
+
+  server.on("/call/ringing", HTTP_POST, [this](AsyncWebServerRequest *request){
+    request->send(200, "text/plain");
+    desiredDisplayState = ringing;
+  });
+
+  server.on("/call/missed", HTTP_POST, [this](AsyncWebServerRequest *request){
+    request->send(200, "text/plain");
+    desiredDisplayState = missed;
+  });
+
+  server.on("/call/clear", HTTP_POST, [this](AsyncWebServerRequest *request){
+    request->send(200, "text/plain");
+    desiredDisplayState = idle;
+  });
+  
+  server.begin();
+
   delay(1000);
   tft.fillScreen(ST7735_BLACK);
+
+  lastHeartbeat = millis();
+  heartBeatOk = true;
 }
 
 void Application::loop() {
@@ -61,6 +110,61 @@ void Application::loop() {
     logger.fatal("Wifi connection failed and unable to reconnect after %d trials during %ds. Resetting.", 12, 12 * wifiConnectionTimeoutInMs / 1000);
     ESP.reset();
   }
+
+  unsigned long currentMillis = millis();
+
+  bool previousStatus = heartBeatOk;
+
+  if (currentMillis - lastHeartbeat >= 30 * ONE_SECOND_IN_MS) {
+    heartBeatOk = false;
+  }
+  else {
+    heartBeatOk = true;
+  }
+
+  if (heartBeatOk != previousStatus) {
+
+    if (!heartBeatOk) {
+      desiredDisplayState = offline;
+      logger.error("Connection lost to host.");
+    }
+    else {
+      desiredDisplayState = idle;
+
+      logger.trace("Connection restored.");
+    }
+  }
+
+  if (lastprocessedDisplayState != desiredDisplayState) {
+
+    if (desiredDisplayState == offline) {
+        logger.trace("device is offline");
+        tft.fillScreen(DarkRed16);
+    }
+
+    if (desiredDisplayState == idle) {
+        logger.trace("device is idle");
+        tft.fillScreen(0);
+    }
+
+    if (desiredDisplayState == ringing) {
+        logger.trace("incoming call");
+        tft.fillScreen(DarkBlue16);
+    }
+
+    if (desiredDisplayState == active) {
+        logger.trace("active call");
+        tft.fillScreen(DarkGreen16);
+    }
+
+    if (desiredDisplayState == missed) {
+        logger.trace("missed call");
+        tft.fillScreen(PureOrange16);
+    }
+
+    lastprocessedDisplayState = desiredDisplayState;
+  }
+
 }
 
 void Application::setupWifi() {
