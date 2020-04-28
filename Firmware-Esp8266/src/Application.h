@@ -7,20 +7,16 @@
 #include "RemoteUpdater.h"
 #include "AppConfig.h"
 
-#include <Adafruit_GFX.h>      // include Adafruit graphics library
-#include <Adafruit_ST7735.h>   // include Adafruit ST7735 TFT library
-
 #include <ESPAsyncTCP.h>
 #include "ESPAsyncWebServer.h"
 
-// ST7735 TFT module connections
-#define TFT_RST   2     // TFT RST pin is connected to NodeMCU pin D4 (GPIO2)
-#define TFT_CS    0     // TFT CS  pin is connected to NodeMCU pin D4 (GPIO0)
-#define TFT_DC    4     // TFT DC  pin is connected to NodeMCU pin D4 (GPIO4)
+#include <TFT_eSPI.h>
 
 class Application {
 
 private:
+
+    TFT_eSPI tft = TFT_eSPI();
 
     AppConfig config;
     WiFiClient wifiClient;
@@ -29,7 +25,7 @@ private:
     RemoteUpdater remoteUpdater;
 
     log4Esp::Logger logger = log4Esp::Logger("Application");
-    Adafruit_ST7735 tft = Adafruit_ST7735(TFT_CS, TFT_DC, TFT_RST);
+
     AsyncWebServer server = AsyncWebServer(80);  
 
     char deviceId[10];

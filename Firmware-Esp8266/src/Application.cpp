@@ -1,4 +1,5 @@
 #include "Application.h"
+#include "Colors.h"
 
 int const ONE_SECOND_IN_MS = 1000;
 int wifiConnectionTimeoutInMs = 10 * ONE_SECOND_IN_MS;
@@ -11,30 +12,17 @@ enum DisplayState { idle, offline, ringing, active, missed };
 DisplayState desiredDisplayState = idle;
 DisplayState lastprocessedDisplayState = idle;
 
-#define Blue16  0xF800
-#define Red16  0x001F
-#define Green16 0x07E0
-
-#define DarkRed16 0x15
-#define DarkBlue16 0xB0DD
-#define DarkGreen16 0x316
-#define PureOrange16 0x412
-
-#define bgr(r, b, g) (b << 10) + (g << 5) + r
-
-Application::Application() {
-  
-}
+Application::Application() { }
 
 void Application::bootstrap() {
   
-  tft.initR(INITR_GREENTAB);
+  tft.init();
 
   tft.setRotation(3);
-  tft.fillScreen(ST7735_BLACK);
+  tft.fillScreen(BLUE);
 
   tft.setCursor(0, 0);
-  tft.setTextColor(ST7735_WHITE);
+  tft.setTextColor(WHITE);
   tft.setTextWrap(true);
   tft.println("Application is starting...");
 
@@ -87,7 +75,7 @@ void Application::bootstrap() {
   server.begin();
 
   delay(1000);
-  tft.fillScreen(ST7735_BLACK);
+  tft.fillScreen(BLACK);
 
   lastHeartbeat = millis();
   heartBeatOk = true;
@@ -139,27 +127,27 @@ void Application::loop() {
 
     if (desiredDisplayState == offline) {
         logger.trace("device is offline");
-        tft.fillScreen(DarkRed16);
+        tft.fillScreen(DARK_RED);
     }
 
     if (desiredDisplayState == idle) {
         logger.trace("device is idle");
-        tft.fillScreen(0);
+        tft.fillScreen(BLACK);
     }
 
     if (desiredDisplayState == ringing) {
         logger.trace("incoming call");
-        tft.fillScreen(DarkBlue16);
+        tft.fillScreen(DARK_BLUE);
     }
 
     if (desiredDisplayState == active) {
         logger.trace("active call");
-        tft.fillScreen(DarkGreen16);
+        tft.fillScreen(DARK_GREEN);
     }
 
     if (desiredDisplayState == missed) {
         logger.trace("missed call");
-        tft.fillScreen(PureOrange16);
+        tft.fillScreen(ORANGE);
     }
 
     lastprocessedDisplayState = desiredDisplayState;
