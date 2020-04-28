@@ -17,9 +17,9 @@ Application::Application() { }
 void Application::bootstrap() {
   
   tft.init();
-
+  
   tft.setRotation(3);
-  tft.fillScreen(BLUE);
+  tft.fillScreen(BLACK);
 
   tft.setCursor(0, 0);
   tft.setTextColor(WHITE);
@@ -60,15 +60,24 @@ void Application::bootstrap() {
   server.on("/call/ringing", HTTP_POST, [this](AsyncWebServerRequest *request){
     request->send(200, "text/plain");
     desiredDisplayState = ringing;
+    lastHeartbeat = millis();    
   });
 
   server.on("/call/missed", HTTP_POST, [this](AsyncWebServerRequest *request){
     request->send(200, "text/plain");
     desiredDisplayState = missed;
+    lastHeartbeat = millis();    
+  });
+
+  server.on("/call/active", HTTP_POST, [this](AsyncWebServerRequest *request){
+    request->send(200, "text/plain");
+    desiredDisplayState = active;
+    lastHeartbeat = millis();    
   });
 
   server.on("/call/clear", HTTP_POST, [this](AsyncWebServerRequest *request){
     request->send(200, "text/plain");
+    lastHeartbeat = millis();    
     desiredDisplayState = idle;
   });
   
