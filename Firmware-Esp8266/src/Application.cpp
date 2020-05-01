@@ -16,7 +16,7 @@ Application::Application() { }
 
 void Application::bootstrap() {
 
-  startup.addStep("Application is starting", [this](){ tft.init(); bootscreen.setup(tft); });
+  startup.addStep("Application is starting", [this](){ tft.init(); bootscreen.setup(&tft); });
   startup.addStep("Setting up device",       [this](){ setGeneratedDeviceId(); });
   startup.addStep("Initialize File System",  [this](){ initializeFileSystem(); });
   startup.addStep("Load Configuration",      [this](){ config.load(); });
@@ -30,7 +30,7 @@ void Application::bootstrap() {
   startup.onBeforeTaskStart([this](String name){ bootscreen.showStatus(name); });
 
   startup.onCompleted([this](){ 
-    // bootscreen.hide();
+    bootscreen.hide();
     lastHeartbeat = millis();
     heartBeatOk = true; 
   });

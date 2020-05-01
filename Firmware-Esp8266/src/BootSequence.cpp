@@ -4,10 +4,9 @@ void BootSequence::addStep(String name, function<void()> starter, function<bool(
 
     Task *t = new Task(name.c_str(), starter, completed);
 
-    tasks[headIdx] = t;
     taskQueue.enqueue(t);
 
-    logger.verbose("Added task '%s' to queue", tasks[headIdx]->getName());
+    logger.verbose("Added task '%s' to queue", name.c_str());
 }
 
 void BootSequence::addStep(String name, function<void()> starter) {
@@ -15,10 +14,10 @@ void BootSequence::addStep(String name, function<void()> starter) {
 }
 
 void BootSequence::onBeforeTaskStart(function<void(String)> eventHandler) {
-
+    BootSequence::onBeforeTaskStartHandlers.add(eventHandler);
 }
 void BootSequence::onCompleted(function<void()> eventHandler) {
-
+    BootSequence::onCompletedHandlers.add(eventHandler);
 }
 
 void BootSequence::work() {
@@ -42,6 +41,11 @@ void BootSequence::work() {
     if (!hasStarted) {
         logger.verbose("Task '%s' is starting.", currentTask->getName());
         
+        for (size_t i = 0; i < BootSequence::onBeforeTaskStartHandlers.size(); i++)
+        {
+            BootSequence::onBeforeTaskStartHandlers.get(i)(String(currentTask->getName()));
+        }
+
         currentTask->startFn();
         hasStarted = true;
         return;
@@ -51,7 +55,12 @@ void BootSequence::work() {
         logger.verbose("Task '%s' has completed.", currentTask->getName());
         hasTask = false;
         hasStarted = false;
+    }
 
-        currentIdx++;
+    if (taskQueue.isEmpty()) {
+        for (size_t i = 0; i < BootSequence::onCompletedHandlers.size(); i++)
+        {
+            BootSequence::onCompletedHandlers.get(i)();
+        }
     }
 }

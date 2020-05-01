@@ -3,23 +3,41 @@
 
 
 
-void BootScreen::setup(TFT_eSPI tft) {
-    tft.setRotation(3); tft.fillScreen(BLACK);
+void BootScreen::setup(TFT_eSPI* tft) {
+    tft->setRotation(3); 
+    tft->fillScreen(BLACK);
+
+    BootScreen::tft = tft;
+    isReady = true;
 }
 
 void BootScreen::refresh() {
 
+    if (!isReady) {
+        return;
+    }
 
+    if (currentStatusIsDirty) {
+        
+        tft->fillRect(0, 50, 180, 20, BLACK);
+        tft->setCursor(0, 50);
+        tft->setTextColor(WHITE, BLACK);
+        tft->setTextWrap(true);
+        tft->println(BootScreen::currentStatus.c_str());
+        currentStatusIsDirty = false;
+    }
 
 }
 
 void BootScreen::showStatus(String status) {
 
-// tft.setCursor(0, 50);
-// tft.setTextColor(WHITE);
-// tft.setTextWrap(true);
-// tft.println("Application is starting...");
+    currentStatus = status;
+    currentStatusIsDirty = true;
+    refresh();
+}
 
+void BootScreen::hide() {
+    tft->fillScreen(BLACK);
 }
 
 /*

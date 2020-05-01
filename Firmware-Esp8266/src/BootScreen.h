@@ -5,8 +5,15 @@
 
 class BootScreen {
 public:
-    void setup(TFT_eSPI);
+    void setup(TFT_eSPI*);
     void refresh();
     void showStatus(String);
+    void hide();
+
+private:
+    TFT_eSPI * tft;
+    String currentStatus;
+    bool currentStatusIsDirty;
+    bool isReady;
 };
 #endif

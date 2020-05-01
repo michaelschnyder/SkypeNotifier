@@ -6,6 +6,7 @@
 #include <String>
 #include <Arduino.h>
 #include "libs/QueueArray/QueueArray.h"
+#include "libs/LinkedList2/LinkedList2.h"
 #include <Log4Esp.h>
 
 using namespace std;
@@ -46,23 +47,22 @@ public:
     void addStep(String, function<void()> start, function<bool()> completed);
     void addStep(String, function<void()> start);
 
-
     void work();
 
     void onBeforeTaskStart(function<void(String)> eventHandler);
     void onCompleted(function<void()> eventHandler);
-    
+
 private:
     log4Esp::Logger logger = log4Esp::Logger("BootSequence");
     
     QueueArray <Task *> taskQueue;
     Task *currentTask;
-    
-    Task* tasks[10];
-    int currentIdx = 0;
-    int headIdx = 0;
 
     bool hasTask;
     bool hasStarted;
+
+    LinkedList2<function<void(String)>> onBeforeTaskStartHandlers;
+    LinkedList2<function<void()>> onCompletedHandlers;
+    
 };
 #endif
