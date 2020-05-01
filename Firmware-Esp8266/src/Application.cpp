@@ -3,9 +3,6 @@
 
 int const ONE_SECOND_IN_MS = 1000;
 int wifiConnectionTimeoutInMs = 10 * ONE_SECOND_IN_MS;
-unsigned long lastHeartbeat = 0;
-
-bool heartBeatOk = true;
 
 Application::Application() { }
 
@@ -27,8 +24,9 @@ void Application::bootstrap() {
 
   startup.onCompleted([this](){ 
     bootscreen.hide();
-    lastHeartbeat = millis();
-    heartBeatOk = true; 
+    
+    timer.start(30 * 1000);
+    timer.onCompleted([this]() {statusScreen.setStatus(Offline); });
   });
 }
 
@@ -39,6 +37,7 @@ void Application::loop() {
   statusScreen.refresh();
 
   remoteUpdater.handle();
+  timer.evaluate();
 }
 
 void Application::setGeneratedDeviceId() {
@@ -65,42 +64,39 @@ void Application::initializeFileSystem() {
 }
 
 void Application::setupWebServer() {
-    // respond to GET requests on URL /heap
-  server.on("/status", HTTP_GET, [](AsyncWebServerRequest *request){
+
+  server.on("/status", HTTP_GET, [this](AsyncWebServerRequest *request){
     request->send(200, "text/plain", "Ready");
+    timer.restart();
   });
 
   server.on("/heartbeat", HTTP_GET, [this](AsyncWebServerRequest *request){
     request->send(200, "text/plain");
-    lastHeartbeat = millis();    
+    timer.restart();
   });
 
   server.on("/call/ringing", HTTP_POST, [this](AsyncWebServerRequest *request){
     request->send(200, "text/plain");
     statusScreen.setStatus(IncomingCall);
-
-    lastHeartbeat = millis();    
+    timer.restart();
   });
 
   server.on("/call/missed", HTTP_POST, [this](AsyncWebServerRequest *request){
     request->send(200, "text/plain");
     statusScreen.setStatus(MissedCall);
-
-    lastHeartbeat = millis();    
+    timer.restart();
   });
 
   server.on("/call/active", HTTP_POST, [this](AsyncWebServerRequest *request){
     request->send(200, "text/plain");
     statusScreen.setStatus(ActiveCall);
-
-    lastHeartbeat = millis();    
+    timer.restart();
   });
 
   server.on("/call/clear", HTTP_POST, [this](AsyncWebServerRequest *request){
     request->send(200, "text/plain");
     statusScreen.setStatus(Idle);
-
-    lastHeartbeat = millis();    
+    timer.restart();
   });
 }
 
@@ -113,42 +109,5 @@ void Application::setupWebServer() {
   }
 
 }
-
-void Application::loop() {
-
-  remoteUpdater.handle();
-
-  unsigned long currentMillis = millis();
-
-  bool previousStatus = heartBeatOk;
-
-  if (currentMillis - lastHeartbeat >= 30 * ONE_SECOND_IN_MS) {
-    heartBeatOk = false;
-  }
-  else {
-    heartBeatOk = true;
-  }
-
-  if (heartBeatOk != previousStatus) {
-
-    if (!heartBeatOk) {
-      desiredDisplayState = offline;
-      logger.error("Connection lost to host.");
-    }
-    else {
-      desiredDisplayState = idle;
-
-      logger.trace("Connection restored.");
-    }
-  }
-
-  if (lastprocessedDisplayState != desiredDisplayState) {
-
-
-    lastprocessedDisplayState = desiredDisplayState;
-  }
-
-}
-
 }
 */

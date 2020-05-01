@@ -12,10 +12,12 @@
 
 #include <TFT_eSPI.h>
 #include "BootSequence.h"
+#include "CountDownTimer.h"
 
 #include "Colors.h"
 #include "BootScreen.h"
 #include "StatusScreen.h"
+
 
 class Application {
 
@@ -29,12 +31,12 @@ private:
     AppConfig config;
 
     RemoteUpdater remoteUpdater;
-
+    CountdownTimer timer;
     log4Esp::Logger logger = log4Esp::Logger("Application");
 
     AsyncWebServer server = AsyncWebServer(80);  
     ConnectionManager wifiConnection;
-
+    
     char deviceId[10];
     void setupWifi();
     boolean connectToWifi();
