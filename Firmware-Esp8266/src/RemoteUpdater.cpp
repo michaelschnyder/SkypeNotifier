@@ -40,9 +40,17 @@ void RemoteUpdater::setup(String deviceId) {
             logger.error("Error[%u]: %s", (int)error, "End Failed");
         }
     });
+}
+
+void RemoteUpdater::start() {
     ArduinoOTA.begin(true);
+    isStarted = true;
 }
 
 void RemoteUpdater::handle() {
+    if (!RemoteUpdater::isStarted) {
+        return;
+    }
+
     ArduinoOTA.handle();
 }

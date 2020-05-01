@@ -1,3 +1,6 @@
+#ifndef Colors_h
+#define Colors_h
+
 #define BGR16(color) rgb32_to_bgr16(color)
 #define rgb32_to_bgr16(color) rgbc32_to_bgr16((color & 0xFF0000) >> 16, (color & 0x00FF00) >> 8, (color & 0x0000FF))
 #define rgbc32_to_bgr16(red, green, blue) ((blue & 0b11111000) << 8) | ((green & 0b11111100) << 3) | (red >> 3)
@@ -32,3 +35,5 @@ uint16_t DARK_YELLOW   = RGB16(0xe6c000);
 uint16_t VIOLET        = RGB16(0x9400e8);
 uint16_t STRONG_VIOLET = RGB16(0x8400cf);
 uint16_t DARK_VIOLET   = RGB16(0x63009b);
+
+#endif
