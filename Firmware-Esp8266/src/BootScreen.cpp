@@ -1,7 +1,4 @@
 #include "BootScreen.h"
-#include "Colors.h"
-
-
 
 void BootScreen::setup(TFT_eSPI* tft) {
     tft->setRotation(3); 
@@ -26,7 +23,6 @@ void BootScreen::refresh() {
         tft->println(BootScreen::currentStatus.c_str());
         currentStatusIsDirty = false;
     }
-
 }
 
 void BootScreen::showStatus(String status) {

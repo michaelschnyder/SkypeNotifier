@@ -3,8 +3,6 @@
 
 #include <Log4Esp.h>
 
-#include "BootSequence.h"
-#include "BootScreen.h"
 #include "RemoteUpdater.h"
 #include "ConnectionManager.h"
 #include "AppConfig.h"
@@ -13,6 +11,11 @@
 #include "ESPAsyncWebServer.h"
 
 #include <TFT_eSPI.h>
+#include "BootSequence.h"
+
+#include "Colors.h"
+#include "BootScreen.h"
+#include "StatusScreen.h"
 
 class Application {
 
@@ -20,6 +23,7 @@ private:
 
     BootSequence startup;
     BootScreen bootscreen;
+    StatusScreen statusScreen;
     TFT_eSPI tft = TFT_eSPI();
 
     AppConfig config;

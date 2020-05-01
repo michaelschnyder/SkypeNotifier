@@ -7,11 +7,6 @@ unsigned long lastHeartbeat = 0;
 
 bool heartBeatOk = true;
 
-enum DisplayState { idle, offline, ringing, active, missed };
-
-DisplayState desiredDisplayState = idle;
-DisplayState lastprocessedDisplayState = idle;
-
 Application::Application() { }
 
 void Application::bootstrap() {
@@ -26,6 +21,7 @@ void Application::bootstrap() {
   startup.addStep("Start OTA-Updater",       [this](){ remoteUpdater.start(); });
   startup.addStep("Configure WebServer",     [this](){ setupWebServer(); });
   startup.addStep("Start WebServer",         [this](){ server.begin(); });
+  startup.addStep("Finishing",               [this](){ statusScreen.setup(&tft); });
 
   startup.onBeforeTaskStart([this](String name){ bootscreen.showStatus(name); });
 
@@ -40,9 +36,9 @@ void Application::loop() {
 
   startup.work();
   bootscreen.refresh();
+  statusScreen.refresh();
 
   remoteUpdater.handle();
-
 }
 
 void Application::setGeneratedDeviceId() {
@@ -81,28 +77,31 @@ void Application::setupWebServer() {
 
   server.on("/call/ringing", HTTP_POST, [this](AsyncWebServerRequest *request){
     request->send(200, "text/plain");
-    desiredDisplayState = ringing;
+    statusScreen.setStatus(IncomingCall);
+
     lastHeartbeat = millis();    
   });
 
   server.on("/call/missed", HTTP_POST, [this](AsyncWebServerRequest *request){
     request->send(200, "text/plain");
-    desiredDisplayState = missed;
+    statusScreen.setStatus(MissedCall);
+
     lastHeartbeat = millis();    
   });
 
   server.on("/call/active", HTTP_POST, [this](AsyncWebServerRequest *request){
     request->send(200, "text/plain");
-    desiredDisplayState = active;
+    statusScreen.setStatus(ActiveCall);
+
     lastHeartbeat = millis();    
   });
 
   server.on("/call/clear", HTTP_POST, [this](AsyncWebServerRequest *request){
     request->send(200, "text/plain");
-    lastHeartbeat = millis();    
-    desiredDisplayState = idle;
-  });
+    statusScreen.setStatus(Idle);
 
+    lastHeartbeat = millis();    
+  });
 }
 
 /*
@@ -145,30 +144,6 @@ void Application::loop() {
 
   if (lastprocessedDisplayState != desiredDisplayState) {
 
-    if (desiredDisplayState == offline) {
-        logger.trace("device is offline");
-        tft.fillScreen(DARK_RED);
-    }
-
-    if (desiredDisplayState == idle) {
-        logger.trace("device is idle");
-        tft.fillScreen(BLACK);
-    }
-
-    if (desiredDisplayState == ringing) {
-        logger.trace("incoming call");
-        tft.fillScreen(DARK_BLUE);
-    }
-
-    if (desiredDisplayState == active) {
-        logger.trace("active call");
-        tft.fillScreen(DARK_GREEN);
-    }
-
-    if (desiredDisplayState == missed) {
-        logger.trace("missed call");
-        tft.fillScreen(ORANGE);
-    }
 
     lastprocessedDisplayState = desiredDisplayState;
   }
