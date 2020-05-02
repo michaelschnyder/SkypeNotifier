@@ -1,19 +1,34 @@
 #include "AnimatedGif.h"
 
-void AnimatedGif::setup(TFT_eSPI* tft) {
+void AnimatedGif::init(TFT_eSPI* tft) {
     AnimatedGif::tft = tft;
 
     isReady = true;
-
+    msPerFrame = 1000 / 25;
 }
 
-void AnimatedGif::setImage(const uint16_t * img) {
+void AnimatedGif::hide() {
+    isReady = false;
+}
+
+void AnimatedGif::setPosition(uint32_t x, uint32_t y) {
+    AnimatedGif::x = x;
+    AnimatedGif::y = y;
+}
+
+void AnimatedGif::setFramesPerSecond(int frames) {
+    msPerFrame = 1000 / 25;
+}
+
+void AnimatedGif::setTotalFrames(int numberOfFrames) {
+    AnimatedGif::numberOfFrames = numberOfFrames;
+}
+
+void AnimatedGif::setImage(const uint16_t * img, uint32_t width, uint32_t height) {
     image = img;
+    AnimatedGif::width = width;
+    AnimatedGif::height = height;
 }
-
-unsigned long lastUpdated = millis();
-long intervalMs = 50;
-long numberOfFrames = 8;
 
 void AnimatedGif::refresh() {
 
@@ -22,18 +37,14 @@ void AnimatedGif::refresh() {
     }
 
     unsigned long currentMillis = millis();
-    if (currentMillis - lastUpdated < intervalMs) {
+    if (currentMillis - lastUpdated < msPerFrame) {
         return;
     }
-
-    Serial.printf("Show frame with id %d\n", currentFrame);
 
     lastUpdated = millis();
 
     tft->startWrite();
-    uint16_t width = 0x20; //32
-    uint16_t height = 0x20; //32
-    tft->setAddrWindow((160 - width) / 2, 5, width, height);
+    tft->setAddrWindow(x, y, width, height);
     tft->startWrite();
     
     uint64_t frameOffset = (height * width) * currentFrame;

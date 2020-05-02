@@ -21,6 +21,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Skype.Client.Tests", "Skype
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "SkypeClient", "SkypeClient", "{E261D15F-059D-4715-9F8A-E51E57DB2F03}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Gif2CppConverter", "Gif2CppConverter\Gif2CppConverter.csproj", "{0B76EF91-12AB-4CC2-951E-A6162A52A7C1}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -93,6 +95,14 @@ Global
 		{822CBA60-D839-4168-AA69-99EA29912018}.Release|Any CPU.Build.0 = Release|Any CPU
 		{822CBA60-D839-4168-AA69-99EA29912018}.Release|x64.ActiveCfg = Release|Any CPU
 		{822CBA60-D839-4168-AA69-99EA29912018}.Release|x64.Build.0 = Release|Any CPU
+		{0B76EF91-12AB-4CC2-951E-A6162A52A7C1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0B76EF91-12AB-4CC2-951E-A6162A52A7C1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0B76EF91-12AB-4CC2-951E-A6162A52A7C1}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{0B76EF91-12AB-4CC2-951E-A6162A52A7C1}.Debug|x64.Build.0 = Debug|Any CPU
+		{0B76EF91-12AB-4CC2-951E-A6162A52A7C1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0B76EF91-12AB-4CC2-951E-A6162A52A7C1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0B76EF91-12AB-4CC2-951E-A6162A52A7C1}.Release|x64.ActiveCfg = Release|Any CPU
+		{0B76EF91-12AB-4CC2-951E-A6162A52A7C1}.Release|x64.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
