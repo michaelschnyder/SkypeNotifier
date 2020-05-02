@@ -11,7 +11,7 @@
 #include "ESPAsyncWebServer.h"
 
 #include <TFT_eSPI.h>
-#include "BootSequence.h"
+#include "TaskRunner.h"
 #include "CountDownTimer.h"
 
 #include "Colors.h"
@@ -23,7 +23,7 @@ class Application {
 
 private:
 
-    BootSequence startup;
+    TaskRunner startup;
     BootScreen bootscreen;
     StatusScreen statusScreen;
     TFT_eSPI tft = TFT_eSPI();

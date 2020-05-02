@@ -8,17 +8,17 @@ void Application::bootstrap() {
   startup.setTaskTimeoutInMs(5 * 1000);
   startup.setTaskRetryCount(10);
 
-  startup.addStep("Application is starting", [this](){ tft.init(); bootscreen.setup(&tft); });
-  startup.addStep("Setting up device",       [this](){ setGeneratedDeviceId(); });
-  startup.addStep("Initialize File System",  [this](){ initializeFileSystem(); });
-  startup.addStep("Load Configuration",      [this](){ config.load(); });
-  startup.addStep("Initializing Wifi",       [this](){ wifiConnection.setupWifi(config.getWifiSSID(), config.getWifiKey()); });
-  startup.addStep("Connecting to Wifi",      [this](){ wifiConnection.connectToWifi(); }, [this]() { return wifiConnection.isConnected(); });
-  startup.addStep("Configure OTA-Updater",   [this](){ remoteUpdater.setup(deviceId); });
-  startup.addStep("Start OTA-Updater",       [this](){ remoteUpdater.start(); });
-  startup.addStep("Configure WebServer",     [this](){ setupWebServer(); });
-  startup.addStep("Start WebServer",         [this](){ server.begin(); });
-  startup.addStep("Finishing",               [this](){ statusScreen.setup(&tft); });
+  startup.addTask("Application is starting", [this](){ tft.init(); bootscreen.setup(&tft); });
+  startup.addTask("Setting up device",       [this](){ setGeneratedDeviceId(); });
+  startup.addTask("Initialize File System",  [this](){ initializeFileSystem(); });
+  startup.addTask("Load Configuration",      [this](){ config.load(); });
+  startup.addTask("Initializing Wifi",       [this](){ wifiConnection.setupWifi(config.getWifiSSID(), config.getWifiKey()); });
+  startup.addTask("Connecting to Wifi",      [this](){ wifiConnection.connectToWifi(); }, [this]() { return wifiConnection.isConnected(); });
+  startup.addTask("Configure OTA-Updater",   [this](){ remoteUpdater.setup(deviceId); });
+  startup.addTask("Start OTA-Updater",       [this](){ remoteUpdater.start(); });
+  startup.addTask("Configure WebServer",     [this](){ setupWebServer(); });
+  startup.addTask("Start WebServer",         [this](){ server.begin(); });
+  startup.addTask("Finishing",               [this](){ statusScreen.setup(&tft); });
 
   startup.onBeforeTaskStart([this](String name){ bootscreen.showStatus(name); });
 

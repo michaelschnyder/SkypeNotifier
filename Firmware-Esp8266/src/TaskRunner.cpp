@@ -1,43 +1,40 @@
-#include "BootSequence.h"
+#include "TaskRunner.h"
 
-void BootSequence::addStep(String name, function<void()> starter, function<bool()> completed) {
-
+void TaskRunner::addTask(String name, function<void()> starter, function<bool()> completed) {
     Task *t = new Task(name.c_str(), starter, completed);
-
     taskQueue.enqueue(t);
-
     logger.verbose("Added task '%s' to queue", name.c_str());
 }
 
-void BootSequence::addStep(String name, function<void()> starter) {
-    BootSequence::addStep(name, starter, [](){ return true; });
+void TaskRunner::addTask(String name, function<void()> starter) {
+    addTask(name, starter, [](){ return true; });
 }
 
-void BootSequence::setTaskTimeoutInMs(long timeoutInMs) {
+void TaskRunner::setTaskTimeoutInMs(long timeoutInMs) {
     defaultTimeout = timeoutInMs;
 }
-void BootSequence::setTaskRetryCount(long retryCount) {
+void TaskRunner::setTaskRetryCount(long retryCount) {
     defaultRetryCount = retryCount;
 }
 
-void BootSequence::onBeforeTaskStart(function<void(String)> eventHandler) {
+void TaskRunner::onBeforeTaskStart(function<void(String)> eventHandler) {
     onBeforeTaskStartHandlers.add(eventHandler);
 }
-void BootSequence::onCompleted(function<void()> eventHandler) {
+void TaskRunner::onCompleted(function<void()> eventHandler) {
     onCompletedHandlers.add(eventHandler);
 }
 
-void BootSequence::onTaskExpired(function<void(String)> eventHandler) {
+void TaskRunner::onTaskExpired(function<void(String)> eventHandler) {
     onTaskExpiredHandlers.add(eventHandler);
 }
 
-void BootSequence::cancel() {
+void TaskRunner::cancel() {
     while(!taskQueue.isEmpty()) {
         taskQueue.dequeue();
     }
 }
 
-void BootSequence::work() {
+void TaskRunner::work() {
     
     if (!hasTask) {
         if (taskQueue.isEmpty()) {
@@ -60,7 +57,7 @@ void BootSequence::work() {
         
         for (size_t i = 0; i < onBeforeTaskStartHandlers.size(); i++)
         {
-            BootSequence::onBeforeTaskStartHandlers.get(i)(String(currentTask->getName()));
+            TaskRunner::onBeforeTaskStartHandlers.get(i)(String(currentTask->getName()));
         }
 
         currentTask->startFn();
@@ -83,7 +80,7 @@ void BootSequence::work() {
             
             for (size_t i = 0; i < onBeforeTaskStartHandlers.size(); i++)
             {
-                BootSequence::onTaskExpiredHandlers.get(i)(String(currentTask->getName()));
+                TaskRunner::onTaskExpiredHandlers.get(i)(String(currentTask->getName()));
             }
 
             hasTask = false;
@@ -99,9 +96,9 @@ void BootSequence::work() {
     }
 
     if (taskQueue.isEmpty()) {
-        for (size_t i = 0; i < BootSequence::onCompletedHandlers.size(); i++)
+        for (size_t i = 0; i < TaskRunner::onCompletedHandlers.size(); i++)
         {
-            BootSequence::onCompletedHandlers.get(i)();
+            TaskRunner::onCompletedHandlers.get(i)();
         }
     }
 }
