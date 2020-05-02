@@ -7,6 +7,7 @@ void CountdownTimer::start(long timeOutInMilliseconds) {
 }
 
 void CountdownTimer::restart() {
+    isStarted = true;
     startTime = millis();    
 }
 
@@ -23,6 +24,7 @@ void CountdownTimer::evaluate() {
     }
 
     if (timeOut) {
+        isStarted = false;
         for (size_t i = 0; i < onCompletedHandlers.size(); i++)
         {
             onCompletedHandlers.get(i)();   
