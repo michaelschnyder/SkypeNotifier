@@ -1,10 +1,15 @@
 #include "BootScreen.h"
+#include "spinner.01.h"
 
 void BootScreen::setup(TFT_eSPI* tft) {
     tft->setRotation(3); 
     tft->fillScreen(BLACK);
 
     BootScreen::tft = tft;
+
+    spinner.setup(tft);
+    spinner.setImage(arrayspinner);
+
     isReady = true;
 }
 
@@ -23,6 +28,8 @@ void BootScreen::refresh() {
         tft->println(BootScreen::currentStatus.c_str());
         currentStatusIsDirty = false;
     }
+
+    spinner.refresh();
 }
 
 void BootScreen::showStatus(String status) {
@@ -35,21 +42,3 @@ void BootScreen::showStatus(String status) {
 void BootScreen::hide() {
     tft->fillScreen(BLACK);
 }
-
-/*
-  tft.startWrite();
-  uint16_t width = 0x20; //32
-  uint16_t height = 0x20; //32
-  tft.setAddrWindow((160 - width) / 2, 5, width, height);
-  tft.startWrite();
-  
-  for (uint64_t k = 0; k < width * height; k++) {
-    uint16_t color = pgm_read_word_near(spinner32 + k);
-    tft.pushColor(color); 
-  }
-  
-  tft.endWrite();
-
-
-
-*/

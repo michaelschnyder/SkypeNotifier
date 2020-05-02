@@ -2,6 +2,7 @@
 #define BootScreen_h
 
 #include <TFT_eSPI.h>
+#include "AnimatedGif.h"
 #include "../Colors.h"
 
 class BootScreen {
@@ -16,5 +17,7 @@ private:
     String currentStatus;
     bool currentStatusIsDirty;
     bool isReady;
+
+    AnimatedGif spinner;
 };
 #endif
