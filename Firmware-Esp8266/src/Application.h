@@ -3,21 +3,21 @@
 
 #include <Log4Esp.h>
 
-#include "RemoteUpdater.h"
-#include "ConnectionManager.h"
-#include "AppConfig.h"
+#include "Network/RemoteUpdater.h"
+#include "Network/ConnectionManager.h"
+
+#include "System/AppConfig.h"
 
 #include <ESPAsyncTCP.h>
 #include "ESPAsyncWebServer.h"
 
 #include <TFT_eSPI.h>
-#include "TaskRunner.h"
-#include "CountDownTimer.h"
+#include "System/TaskRunner.h"
+#include "System/CountDownTimer.h"
 
 #include "Colors.h"
-#include "BootScreen.h"
+#include "Startup/BootScreen.h"
 #include "StatusScreen.h"
-
 
 class Application {
 

@@ -1,5 +1,4 @@
 #include "Application.h"
-// #include "spinner.01.h"
 
 Application::Application() { }
 

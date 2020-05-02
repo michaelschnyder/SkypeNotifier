@@ -3,7 +3,7 @@
 
 #include <functional>
 #include <Arduino.h>
-#include "libs/LinkedList2/LinkedList2.h"
+#include "../libs/LinkedList2/LinkedList2.h"
 
 using namespace std;
 

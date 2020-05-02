@@ -4,8 +4,8 @@
 #include <functional>
 #include <String>
 #include <Arduino.h>
-#include "libs/QueueArray/QueueArray.h"
-#include "libs/LinkedList2/LinkedList2.h"
+#include "../libs/QueueArray/QueueArray.h"
+#include "../libs/LinkedList2/LinkedList2.h"
 #include <Log4Esp.h>
 
 using namespace std;

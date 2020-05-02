@@ -2,7 +2,7 @@
 #define BootScreen_h
 
 #include <TFT_eSPI.h>
-#include "Colors.h"
+#include "../Colors.h"
 
 class BootScreen {
 public:
