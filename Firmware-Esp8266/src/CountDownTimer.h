@@ -18,6 +18,8 @@ public:
 private:
     long timeoutInMs;
     long startTime;
+    bool isStarted;
+    
     LinkedList2<function<void()>> onCompletedHandlers;
 
 };

@@ -1,7 +1,7 @@
 #include "CountDownTimer.h"
 
 void CountdownTimer::start(long timeOutInMilliseconds) {
-    
+    isStarted = true;
     startTime = millis();    
     timeoutInMs = timeOutInMilliseconds;
 }
@@ -11,6 +11,10 @@ void CountdownTimer::restart() {
 }
 
 void CountdownTimer::evaluate() {
+
+    if (!isStarted) {
+        return;
+    }
 
     long currentMillis = millis();
     bool timeOut = false;
