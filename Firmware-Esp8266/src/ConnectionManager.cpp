@@ -1,38 +1,27 @@
 #include "ConnectionManager.h"
 
-void ConnectionManager::setupWifi() {
+void ConnectionManager::setupWifi(String ssid, String password) {
   WiFi.mode(WIFI_STA);    // Station Mode, i.e. connect to a WIFI and don't serve as AP
   WiFi.persistent(false); // Do not store WIFI information in EEPROM.
+
+  ConnectionManager::ssid = ssid;
+  ConnectionManager::password = password;
 }
 
-bool ConnectionManager::connectToWifi(String ssid, String password, long timeout) { 
+bool ConnectionManager::connectToWifi() { 
 
   logger.trace("Connecting to WLAN with SSID '%s'. This may take some time...", ssid.c_str());
 
-  WiFi.begin(ssid, password);
-  
-  long lastAttemptt = millis();
-  bool isTimeout = false;
-
-  while (WiFi.status() != WL_CONNECTED && !isTimeout)
-  {
-    delay(50);
-    
-    unsigned long currentMillis = millis();
-    isTimeout = (currentMillis - lastAttemptt) >= timeout;
-  }
-
-  if(isTimeout) {
-    logger.error("Could not connect to Wifi with SSID '%s' after %ds", ssid.c_str(), timeout / 1000);
-    return false;
-  }
-
-  logger.trace("Connected, IP address: %s", WiFi.localIP().toString().c_str());
-  return true;
+  WiFi.begin(ssid, password); 
 }
 
 bool ConnectionManager::isConnected() {
-    return WiFi.status() == WL_CONNECTED;
+    if (WiFi.status() != WL_CONNECTED) {
+      return false;
+    }
+
+  logger.trace("Connected, IP address: %s", WiFi.localIP().toString().c_str());
+  return true;
 }
 
 

@@ -42,15 +42,18 @@ private:
 class BootSequence {
 
 public:
-    // void addStep(String, BootStepHandlerFunction, BootStepStatusReturnFunction);
-    // void addStep(String, function<void(String)> onRequest);
     void addStep(String, function<void()> start, function<bool()> completed);
     void addStep(String, function<void()> start);
 
+    void setTaskTimeoutInMs(long);
+    void setTaskRetryCount(long);
+
     void work();
+    void cancel();
 
     void onBeforeTaskStart(function<void(String)> eventHandler);
     void onCompleted(function<void()> eventHandler);
+    void onTaskExpired(function<void(String)> eventHandler);
 
 private:
     log4Esp::Logger logger = log4Esp::Logger("BootSequence");
@@ -60,9 +63,15 @@ private:
 
     bool hasTask;
     bool hasStarted;
+    long currentTaskStartTime;
+    long currentTaskRetryCount;
+
+    long defaultTimeout;
+    long defaultRetryCount;
 
     LinkedList2<function<void(String)>> onBeforeTaskStartHandlers;
     LinkedList2<function<void()>> onCompletedHandlers;
+    LinkedList2<function<void(String)>> onTaskExpiredHandlers;
     
 };
 #endif

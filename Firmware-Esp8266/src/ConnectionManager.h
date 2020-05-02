@@ -8,9 +8,11 @@ class ConnectionManager {
 private:
     log4Esp::Logger logger = log4Esp::Logger("ConnectionManager");
 
+    String ssid;
+    String password;
 public:
-    void setupWifi();
-    bool connectToWifi(String ssid, String password, long timeout);
+    void setupWifi(String ssid, String password);
+    bool connectToWifi();
     bool isConnected();
 };
 #endif

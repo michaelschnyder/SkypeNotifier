@@ -32,6 +32,7 @@ private:
 
     RemoteUpdater remoteUpdater;
     CountdownTimer timer;
+    CountdownTimer restartTimer;
     log4Esp::Logger logger = log4Esp::Logger("Application");
 
     AsyncWebServer server = AsyncWebServer(80);  

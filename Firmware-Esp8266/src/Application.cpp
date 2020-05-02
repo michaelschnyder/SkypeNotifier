@@ -1,19 +1,19 @@
 #include "Application.h"
 // #include "spinner.01.h"
 
-int const ONE_SECOND_IN_MS = 1000;
-int wifiConnectionTimeoutInMs = 10 * ONE_SECOND_IN_MS;
-
 Application::Application() { }
 
 void Application::bootstrap() {
+
+  startup.setTaskTimeoutInMs(5 * 1000);
+  startup.setTaskRetryCount(10);
 
   startup.addStep("Application is starting", [this](){ tft.init(); bootscreen.setup(&tft); });
   startup.addStep("Setting up device",       [this](){ setGeneratedDeviceId(); });
   startup.addStep("Initialize File System",  [this](){ initializeFileSystem(); });
   startup.addStep("Load Configuration",      [this](){ config.load(); });
-  startup.addStep("Initializing Wifi",       [this](){ wifiConnection.setupWifi(); });
-  startup.addStep("Connecting to Wifi",      [this](){ wifiConnection.connectToWifi(config.getWifiSSID(), config.getWifiKey(), wifiConnectionTimeoutInMs); });
+  startup.addStep("Initializing Wifi",       [this](){ wifiConnection.setupWifi(config.getWifiSSID(), config.getWifiKey()); });
+  startup.addStep("Connecting to Wifi",      [this](){ wifiConnection.connectToWifi(); }, [this]() { return wifiConnection.isConnected(); });
   startup.addStep("Configure OTA-Updater",   [this](){ remoteUpdater.setup(deviceId); });
   startup.addStep("Start OTA-Updater",       [this](){ remoteUpdater.start(); });
   startup.addStep("Configure WebServer",     [this](){ setupWebServer(); });
@@ -28,6 +28,16 @@ void Application::bootstrap() {
     timer.start(30 * 1000);
     timer.onCompleted([this]() {statusScreen.setStatus(Offline); });
   });
+
+  startup.onTaskExpired([this](String name) { 
+    startup.cancel();
+
+    logger.fatal("Failed to run '%s'. Restarting ESP in 2s", name.c_str());
+    bootscreen.showStatus("Failed. Restart in 2s...");
+
+    restartTimer.start(2 * 1000);
+    restartTimer.onCompleted([this]() { ESP.reset();  });
+  });
 }
 
 void Application::loop() {
@@ -38,6 +48,7 @@ void Application::loop() {
 
   remoteUpdater.handle();
   timer.evaluate();
+  restartTimer.evaluate();
 }
 
 void Application::setGeneratedDeviceId() {
@@ -99,15 +110,3 @@ void Application::setupWebServer() {
     timer.restart();
   });
 }
-
-/*
-  if (!wifiConnection.connectToWifi(config.getWifiSSID(), config.getWifiKey(), wifiConnectionTimeoutInMs)) {
-
-    logger.fatal("Can't connect to WIFI. Restarting ESP in 2s");
-    delay(2000);
-    ESP.reset();
-  }
-
-}
-}
-*/
