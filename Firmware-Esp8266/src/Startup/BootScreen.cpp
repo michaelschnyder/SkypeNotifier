@@ -6,7 +6,10 @@
 
 void BootScreen::setup(TFT_eSPI* tft) {
     tft->setRotation(3); 
-    tft->fillScreen(BLACK);
+
+
+    tft->fillScreen(0x1082);
+    tft->loadFont(AA_FONT_SMALL);
 
     BootScreen::tft = tft;
 
@@ -31,9 +34,13 @@ void BootScreen::refresh() {
     if (currentStatusIsDirty) {
         
         tft->fillRect(0, STATUSTEXT_Y, 180, 20, BLACK);
-        tft->setCursor(0, STATUSTEXT_Y);
-        tft->setTextColor(WHITE, BLACK);
+
+        tft->setTextColor(WHITE, 0x1082);
         tft->setTextWrap(true);
+
+        // tft->setCursor(50, 50);
+        // tft->print(currentStatus); // println moves cursor down for a new line
+
         tft->drawCentreString(BootScreen::currentStatus.c_str(), 80, STATUSTEXT_Y, 1);
         currentStatusIsDirty = false;
     }

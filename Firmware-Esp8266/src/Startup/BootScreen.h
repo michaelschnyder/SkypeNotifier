@@ -4,6 +4,9 @@
 #include <TFT_eSPI.h>
 #include "AnimatedGif.h"
 #include "../Colors.h"
+#include "NotoSansBold15.h"
+
+#define AA_FONT_SMALL NotoSansBold15
 
 class BootScreen {
 public:
