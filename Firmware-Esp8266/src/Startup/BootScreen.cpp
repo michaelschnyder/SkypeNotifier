@@ -1,5 +1,5 @@
 #include "BootScreen.h"
-#include "spinner.01.h"
+#include "../res/Resources.h"
 
 #define SPINNER_Y 35
 #define STATUSTEXT_Y 80
@@ -37,9 +37,6 @@ void BootScreen::refresh() {
 
         tft->setTextColor(WHITE, 0x1082);
         tft->setTextWrap(true);
-
-        // tft->setCursor(50, 50);
-        // tft->print(currentStatus); // println moves cursor down for a new line
 
         tft->drawCentreString(BootScreen::currentStatus.c_str(), 80, STATUSTEXT_Y, 1);
         currentStatusIsDirty = false;
