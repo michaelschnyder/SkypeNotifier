@@ -5,7 +5,9 @@
 
 #define AA_FONT_SMALL NotoSansBold15
 
-#include "spinner.01.h"
+#include "spinner-32.h"
+#include "ringing-64.h"
+#include "heartbeat-single-64.h"
 
 #endif // Resources_H
 
