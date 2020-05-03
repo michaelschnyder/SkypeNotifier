@@ -9,6 +9,11 @@ void TaskRunner::addTask(String name, function<void()> starter) {
     addTask(name, starter, [](){ return true; });
 }
 
+void TaskRunner::addTask(String name, long delay) {
+    Task *t = new DelayTask(name.c_str(), delay);
+    addTask(t);
+}
+
 void TaskRunner::addTask(Task * t) {
     taskQueue.enqueue(t);
     logger.verbose("Added task '%s' to queue", t->getName());
@@ -46,10 +51,6 @@ void TaskRunner::work() {
         }
 
         logger.verbose("Getting new task from queue...");
-
-        if (currentTask) {
-            delete currentTask;
-        }
 
         currentTask = taskQueue.dequeue();
 

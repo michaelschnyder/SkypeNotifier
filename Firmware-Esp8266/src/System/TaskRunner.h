@@ -65,6 +65,7 @@ class TaskRunner {
 public:
     void addTask(String, function<void()> start, function<bool()> completed);
     void addTask(String, function<void()> start);
+    void addTask(String name, long delay);
     void addTask(Task* t);
     void setTaskTimeoutInMs(long);
     void setTaskRetryCount(long);
