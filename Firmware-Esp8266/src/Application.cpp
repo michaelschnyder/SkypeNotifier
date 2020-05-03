@@ -17,7 +17,8 @@ void Application::bootstrap() {
   startup.addTask("Start OTA-Updater",       [this](){ remoteUpdater.start(); });
   startup.addTask("Configure WebServer",     [this](){ setupWebServer(); });
   startup.addTask("Starting WebServer",      [this](){ server.begin(); });
-  startup.addTask("Ready",                   [this](){ statusScreen.setup(&tft); });
+  startup.addTask(new DelayTask("Ready", 1000));
+  startup.addTask("",                        [this](){ statusScreen.setup(&tft); });
                   
   startup.onBeforeTaskStart([this](String name){ bootscreen.showStatus(name); });
 

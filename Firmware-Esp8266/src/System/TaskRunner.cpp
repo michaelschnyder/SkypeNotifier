@@ -2,12 +2,16 @@
 
 void TaskRunner::addTask(String name, function<void()> starter, function<bool()> completed) {
     Task *t = new Task(name.c_str(), starter, completed);
-    taskQueue.enqueue(t);
-    logger.verbose("Added task '%s' to queue", name.c_str());
+    addTask(t);
 }
 
 void TaskRunner::addTask(String name, function<void()> starter) {
     addTask(name, starter, [](){ return true; });
+}
+
+void TaskRunner::addTask(Task * t) {
+    taskQueue.enqueue(t);
+    logger.verbose("Added task '%s' to queue", t->getName());
 }
 
 void TaskRunner::setTaskTimeoutInMs(long timeoutInMs) {
@@ -42,6 +46,11 @@ void TaskRunner::work() {
         }
 
         logger.verbose("Getting new task from queue...");
+
+        if (currentTask) {
+            delete currentTask;
+        }
+
         currentTask = taskQueue.dequeue();
 
         logger.verbose("Task '%s' is ready to run.", currentTask->getName());
@@ -60,7 +69,7 @@ void TaskRunner::work() {
             TaskRunner::onBeforeTaskStartHandlers.get(i)(String(currentTask->getName()));
         }
 
-        currentTask->startFn();
+        currentTask->start();
         hasStarted = true;
         currentTaskStartTime = millis();
         currentTaskRetryCount = 0;
@@ -89,7 +98,7 @@ void TaskRunner::work() {
         }
     }
 
-    if (currentTask->completedFn()) {
+    if (currentTask->isCompleted()) {
         logger.verbose("Task '%s' has completed.", currentTask->getName());
         hasTask = false;
         hasStarted = false;

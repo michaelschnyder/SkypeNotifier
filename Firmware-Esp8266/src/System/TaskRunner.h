@@ -13,22 +13,51 @@ using namespace std;
 class Task {
 
 public:
-    function<void()> startFn;
-    function<bool()> completedFn;
 
     Task(const char * name, function<void()> start, function<bool()> completed) {
-        
+
         strcpy(_name, name);
         startFn = start;
         completedFn = completed;
     }
 
-    char* getName() {
-        return _name;
+    virtual char* getName() { return _name; }
+
+    virtual void start() {
+        startFn();
+    } 
+
+    virtual bool isCompleted() {
+        return completedFn();
     }
 
 private:
     char _name[64];
+    function<void()> startFn;
+    function<bool()> completedFn;
+};
+
+class DelayTask : public Task {
+    public:
+        DelayTask(const char * name, long delayInMs) : Task(name, NULL, NULL) {
+            delay = delayInMs;
+            strcpy(_name, name);
+        }
+
+        virtual void start() {
+            startTime = millis();
+        } 
+
+        virtual bool isCompleted() {
+            return (millis() - startTime) > delay;
+        }
+
+        virtual char* getName() { return _name; }
+
+    private:
+        char _name[64];
+        long startTime = 0;
+        long delay = 0;
 };
 
 class TaskRunner {
@@ -36,7 +65,7 @@ class TaskRunner {
 public:
     void addTask(String, function<void()> start, function<bool()> completed);
     void addTask(String, function<void()> start);
-
+    void addTask(Task* t);
     void setTaskTimeoutInMs(long);
     void setTaskRetryCount(long);
 
