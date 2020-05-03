@@ -1,10 +1,24 @@
 #include "StatusScreen.h"
+#include "res/Resources.h"
 
 void StatusScreen::setup(TFT_eSPI* tft) {
     tft->setRotation(3); 
     tft->fillScreen(BLACK);
 
     StatusScreen::tft = tft;
+
+    ringing.init(tft);
+    ringing.setPosition((160 - 64) / 2, 20);
+    ringing.setImage(ringing64, 64, 64);
+    ringing.setTotalFrames(37);
+
+
+    heartbeatMissing.init(tft);
+    heartbeatMissing.setPosition((160 - 64) / 2, 20);
+    heartbeatMissing.setImage(heartbeatsingle64, 64, 64);
+    heartbeatMissing.setTotalFrames(1);
+    heartbeatMissing.setFramesPerSecond(1);
+
     isReady = true;
 }
 
@@ -14,11 +28,18 @@ void StatusScreen::refresh() {
         return;
     }
 
+    ringing.refresh();
+    heartbeatMissing.refresh();
+
     if (currentStatusIsDirty) {
         
         if (currentStatus == Offline) {
             logger.trace("device is offline");
-            tft->fillScreen(DARK_RED);
+            tft->fillScreen(0xda8a);
+            heartbeatMissing.start();
+        }
+        else {
+            heartbeatMissing.hide();
         }
 
         if (currentStatus == Idle) {
@@ -28,7 +49,11 @@ void StatusScreen::refresh() {
 
         if (currentStatus == IncomingCall) {
             logger.trace("incoming call");
-            tft->fillScreen(DARK_BLUE);
+            tft->fillScreen(0x040c);
+            ringing.start();
+        }
+        else {
+            ringing.hide();
         }
 
         if (currentStatus == ActiveCall) {
@@ -50,7 +75,7 @@ void StatusScreen::setStatus(ScreenStatus status) {
 
     currentStatus = status;
     currentStatusIsDirty = true;
-    refresh();
+    //refresh();
 }
 
 void StatusScreen::hide() {

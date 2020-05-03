@@ -4,6 +4,7 @@
 #include <Log4Esp.h>
 #include <TFT_eSPI.h>
 #include "Colors.h"
+#include "UI/AnimatedGif.h"
 
 enum ScreenStatus {
     Idle,
@@ -28,6 +29,9 @@ private:
 
     ScreenStatus currentStatus;
     bool currentStatusIsDirty;
+
+    AnimatedGif ringing;
+    AnimatedGif heartbeatMissing;
 
 };
 #endif
