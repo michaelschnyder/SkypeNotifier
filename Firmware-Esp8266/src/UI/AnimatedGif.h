@@ -11,6 +11,7 @@ public:
     void setImage(const uint16_t[], uint32_t width, uint32_t height);
     void setFramesPerSecond(int frames);
     void setTotalFrames(int numberOfframes);
+    void start();
     void refresh();
     void hide();
 

@@ -3,12 +3,17 @@
 void AnimatedGif::init(TFT_eSPI* tft) {
     AnimatedGif::tft = tft;
 
-    isReady = true;
     msPerFrame = 1000 / 25;
 }
 
 void AnimatedGif::hide() {
     isReady = false;
+}
+
+void AnimatedGif::start() {
+    isReady = true;
+    lastUpdated = millis();
+    currentFrame = 0;
 }
 
 void AnimatedGif::setPosition(uint32_t x, uint32_t y) {
