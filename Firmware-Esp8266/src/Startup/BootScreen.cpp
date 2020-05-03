@@ -13,14 +13,11 @@ void BootScreen::setup(TFT_eSPI* tft) {
 
     BootScreen::tft = tft;
 
-    uint16_t width = 0x20;  // 32
-    uint16_t height = 0x20; // 32
-
     spinner.init(tft);
-
-    spinner.setPosition((160 - width) / 2, SPINNER_Y);
-    spinner.setImage(animatedspinner, width, height);
+    spinner.setPosition((160 - 32) / 2, SPINNER_Y);
+    spinner.setImage(spinner32, 32, 32);
     spinner.setTotalFrames(60);
+    spinner.start();
 
     isReady = true;
 }
