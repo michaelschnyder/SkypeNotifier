@@ -68,9 +68,9 @@ namespace Gif2CppConverter
 
                 if (imgFrame is ImageFrame<Rgba32> frame)
                 {
-                    for (int x = 0; x < frame.Width; x++)
+                    for (int y = 0; y < frame.Height; y++)
                     {
-                        for (int y = 0; y < frame.Height; y++)
+                        for (int x = 0; x < frame.Width; x++)
                         {
                             var pixel = frame[x, y];
                             var rgb16 = ToRgb16(pixel.R, pixel.G, pixel.B);
