@@ -17,17 +17,46 @@ namespace Gif2CppConverter
 
         static void Main(string[] args)
         {
+            var path = args[0];
 
-            var gifFile = args[0];
-            var outfile = args[1];
-            var file = new FileInfo(gifFile);
+            var allFiles = new List<string>();
 
-            using var writer = new StreamWriter(outfile);
+            if (Directory.Exists(path))
+            {
+                allFiles.AddRange(Directory.GetFiles(path, "*.gif"));
+            }
+            else if (File.Exists(path))
+            {
+                allFiles.Add(path);
+            }
+
+            if (allFiles.Count == 0)
+            {
+                Console.WriteLine($"No file found at '{Path.GetFullPath(path)}'");
+            }
+
+            foreach (var file in allFiles)
+            {
+                ConvertFile(file);
+            }
+        }
+
+        private static void ConvertFile(string gifFile)
+        {
+            var fileNameWithoutExtension = Path.GetFileNameWithoutExtension(gifFile);
+
+            var outfile = $"{fileNameWithoutExtension}.h";
+            var sourcePath = Path.GetDirectoryName(gifFile);
+            var outFilePath = Path.Combine(sourcePath, outfile);
+
+            var variableName = fileNameWithoutExtension.Replace("-", "");
+
+            using var writer = new StreamWriter(outFilePath);
             using var img = Image.Load(gifFile);
 
             writer.WriteLine("#include <pgmspace.h>\n" +
-                             $"// '{gifFile}', {img.Width}x{img.Height}px\n" +
-                             $"const PROGMEM uint16_t {file.Name.Substring(0, file.Name.Length - file.Extension.Length)} [] = {{");
+                             $"// File '{fileNameWithoutExtension}.gif', Resolution: {img.Width}x{img.Height}px, Frames: {img.Frames.Count}\n" +
+                             $"const PROGMEM uint16_t {variableName} [] = {{");
 
             Console.WriteLine($"Found {img.Frames.Count} in provided file.");
             int frameId = 0;
@@ -45,7 +74,7 @@ namespace Gif2CppConverter
                         {
                             var pixel = frame[x, y];
                             var rgb16 = ToRgb16(pixel.R, pixel.G, pixel.B);
-                            
+
                             writer.Write($"0x{rgb16:x4}, ");
                         }
 
