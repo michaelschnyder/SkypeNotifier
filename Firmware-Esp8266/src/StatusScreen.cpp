@@ -14,8 +14,8 @@ void StatusScreen::setup(TFT_eSPI* tft) {
 
 
     heartbeatMissing.init(tft);
-    heartbeatMissing.setPosition((160 - 64) / 2, 20);
-    heartbeatMissing.setImage(heartbeatsingle64, 64, 64);
+    heartbeatMissing.setPosition((160 - 120) / 2, (128 - 90) / 2);
+    heartbeatMissing.setImage(heartbeatsingle120x90, 120, 90);
     heartbeatMissing.setTotalFrames(1);
     heartbeatMissing.setFramesPerSecond(1);
 
