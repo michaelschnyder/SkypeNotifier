@@ -5,7 +5,6 @@ using System.Net;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.PixelFormats;
 
-
 namespace Gif2CppConverter
 {
     class Program
@@ -18,15 +17,27 @@ namespace Gif2CppConverter
         static void Main(string[] args)
         {
             var path = args[0];
+            var outPath = args.Length > 1 ? args[1] : null;
+            var mode = args.Length > 2 && args[2] == "bin" ? OutputMode.Binary : OutputMode.Cpp;
 
             var allFiles = new List<string>();
 
             if (Directory.Exists(path))
             {
+                if (outPath == null)
+                {
+                    outPath =path;
+                }
+
                 allFiles.AddRange(Directory.GetFiles(path, "*.gif"));
             }
             else if (File.Exists(path))
             {
+                if (outPath == null)
+                {
+                    outPath = Path.GetDirectoryName(path);
+                }
+
                 allFiles.Add(path);
             }
 
@@ -37,34 +48,50 @@ namespace Gif2CppConverter
 
             foreach (var file in allFiles)
             {
-                ConvertFile(file);
+                ConvertFile(file, outPath, mode);
             }
         }
 
-        private static void ConvertFile(string gifFile)
+        private static void ConvertFile(string gifFile, string outPath, OutputMode mode)
         {
             var fileNameWithoutExtension = Path.GetFileNameWithoutExtension(gifFile);
 
-            var outfile = $"{fileNameWithoutExtension}.h";
-            var sourcePath = Path.GetDirectoryName(gifFile);
-            var outFilePath = Path.Combine(sourcePath, outfile);
+            string outfile;
+
+            if (mode == OutputMode.Cpp)
+            {
+                outfile = $"{fileNameWithoutExtension}.h";
+            }
+            else
+            {
+                outfile = $"{fileNameWithoutExtension}.bin";
+            }
+
+            var outFilePath = Path.Combine(outPath, outfile);
 
             var variableName = fileNameWithoutExtension.Replace("-", "");
 
             using var writer = new StreamWriter(outFilePath);
             using var img = Image.Load(gifFile);
 
-            writer.WriteLine("#include <pgmspace.h>\n" +
-                             $"// File '{fileNameWithoutExtension}.gif', Resolution: {img.Width}x{img.Height}px, Frames: {img.Frames.Count}\n" +
-                             $"const PROGMEM uint16_t {variableName} [] = {{");
+            if (mode == OutputMode.Cpp)
+            {
+                writer.WriteLine("#include <pgmspace.h>\n" +
+                                 $"// File '{fileNameWithoutExtension}.gif', Resolution: {img.Width}x{img.Height}px, Frames: {img.Frames.Count}\n" +
+                                 $"const PROGMEM uint16_t {variableName} [] = {{");
+
+            }
 
             Console.WriteLine($"Found {img.Frames.Count} in provided file.");
             int frameId = 0;
 
             foreach (var imgFrame in img.Frames)
             {
-                writer.WriteLine();
-                writer.WriteLine("// Frame " + frameId);
+                if (mode == OutputMode.Cpp)
+                {
+                    writer.WriteLine();
+                    writer.WriteLine("// Frame " + frameId);
+                }
 
                 if (imgFrame is ImageFrame<Rgba32> frame)
                 {
@@ -75,10 +102,20 @@ namespace Gif2CppConverter
                             var pixel = frame[x, y];
                             var rgb16 = ToRgb16(pixel.R, pixel.G, pixel.B);
 
-                            writer.Write($"0x{rgb16:x4}, ");
+                            if (mode == OutputMode.Cpp)
+                            {
+                                writer.Write($"0x{rgb16:x4}, ");
+                            }
+                            else
+                            {
+                                writer.Write(rgb16);
+                            }
                         }
 
-                        writer.WriteLine();
+                        if (mode == OutputMode.Cpp)
+                        {
+                            writer.WriteLine();
+                        }
                     }
                 }
 
@@ -86,8 +123,18 @@ namespace Gif2CppConverter
                 Console.WriteLine($"Completed frame {frameId}");
             }
 
-            writer.WriteLine("};");
+            if (mode == OutputMode.Cpp)
+            {
+                writer.WriteLine("};");
+            }
+
             writer.Close();
         }
+    }
+
+    internal enum OutputMode
+    {
+        Binary,
+        Cpp
     }
 }
