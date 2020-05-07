@@ -74,27 +74,17 @@ namespace Gif2CppConverter
             using var writer = new StreamWriter(outFilePath);
             using var img = Image.Load(gifFile);
 
-            if (mode == OutputMode.Cpp)
-            {
-                writer.WriteLine("#include <pgmspace.h>\n" +
-                                 $"// File '{fileNameWithoutExtension}.gif', Resolution: {img.Width}x{img.Height}px, Frames: {img.Frames.Count}\n" +
-                                 $"const PROGMEM uint16_t {variableName} [] = {{");
-
-            }
-
             Console.WriteLine($"Found {img.Frames.Count} in provided file.");
             int frameId = 0;
+            List<List<int>> frameBytes = new List<List<int>>();
 
             foreach (var imgFrame in img.Frames)
             {
-                if (mode == OutputMode.Cpp)
-                {
-                    writer.WriteLine();
-                    writer.WriteLine("// Frame " + frameId);
-                }
-
                 if (imgFrame is ImageFrame<Rgba32> frame)
                 {
+                    var currentFrame = new List<int>();
+                    frameBytes.Add(currentFrame);
+
                     for (int y = 0; y < frame.Height; y++)
                     {
                         for (int x = 0; x < frame.Width; x++)
@@ -102,33 +92,70 @@ namespace Gif2CppConverter
                             var pixel = frame[x, y];
                             var rgb16 = ToRgb16(pixel.R, pixel.G, pixel.B);
 
-                            if (mode == OutputMode.Cpp)
-                            {
-                                writer.Write($"0x{rgb16:x4}, ");
-                            }
-                            else
-                            {
-                                writer.Write(rgb16);
-                            }
-                        }
-
-                        if (mode == OutputMode.Cpp)
-                        {
-                            writer.WriteLine();
+                            currentFrame.Add(rgb16);
                         }
                     }
                 }
 
                 frameId++;
-                Console.WriteLine($"Completed frame {frameId}");
+                Console.WriteLine($"Read frame {frameId}");
             }
+
+            Console.WriteLine($"Writing output");
 
             if (mode == OutputMode.Cpp)
             {
-                writer.WriteLine("};");
+                WriteCpp(writer, frameBytes, fileNameWithoutExtension, img, variableName);
+            }
+            else
+            {
+                WriteBinary(writer, frameBytes);
             }
 
             writer.Close();
+            Console.WriteLine($"Writing output done");
+
+        }
+
+        private static void WriteBinary(StreamWriter writer, List<List<int>> frameBytes)
+        {
+            for (int frameId = 0; frameId < frameBytes.Count; frameId++)
+            {
+                var currentFrame = frameBytes[frameId];
+
+                foreach (var value in currentFrame)
+                {
+                    writer.Write(value);
+                }
+            }
+        }
+
+        private static void WriteCpp(StreamWriter writer, List<List<int>> frameBytes, String fileNameWithoutExtension, Image img, String variableName)
+        {
+            writer.WriteLine("#include <pgmspace.h>\n" +
+                             $"// File '{fileNameWithoutExtension}.gif', Resolution: {img.Width}x{img.Height}px, Frames: {img.Frames.Count}\n" +
+                             $"const PROGMEM uint16_t {variableName} [] = {{");
+
+            for (int frameId = 0; frameId < frameBytes.Count; frameId++)
+            {
+                writer.WriteLine();
+                writer.WriteLine("// Frame " + frameId);
+                var currentFrame = frameBytes[frameId];
+
+                for (var index = 0; index < currentFrame.Count; index++)
+                {
+                    var value = currentFrame[index];
+                    writer.Write($"0x{value:x4}, ");
+
+                    if ((index + 1) % img.Width == 0)
+                    {
+                        writer.WriteLine();
+                    }
+                }
+            }
+
+            writer.WriteLine("};");
+
         }
     }
 
