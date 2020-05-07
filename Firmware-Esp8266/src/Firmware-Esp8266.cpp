@@ -1,4 +1,5 @@
-#include "src/Application.h"
+#include <Arduino.h>
+#include "Application.h"
 
 Application app;
 void setup() {
