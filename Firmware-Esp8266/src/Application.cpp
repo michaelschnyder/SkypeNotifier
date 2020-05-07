@@ -83,6 +83,7 @@ void Application::setupWebServer() {
 
   server.on("/heartbeat", HTTP_GET, [this](AsyncWebServerRequest *request){
     request->send(200, "text/plain");
+    statusScreen.setStatus(Idle);
     timer.restart();
   });
 
