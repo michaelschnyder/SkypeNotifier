@@ -19,6 +19,7 @@ namespace Gif2CppConverter
             var path = args[0];
             var outPath = args.Length > 1 ? args[1] : null;
             var mode = args.Length > 2 && args[2] == "bin" ? OutputMode.Binary : OutputMode.Cpp;
+            var compression = args.Length > 3 ? Enum.Parse<Compression>(args[3]) : Compression.None;
 
             var allFiles = new List<string>();
 
@@ -48,11 +49,11 @@ namespace Gif2CppConverter
 
             foreach (var file in allFiles)
             {
-                ConvertFile(file, outPath, mode);
+                ConvertFile(file, outPath, mode, compression);
             }
         }
 
-        private static void ConvertFile(string gifFile, string outPath, OutputMode mode)
+        private static void ConvertFile(string gifFile, string outPath, OutputMode mode, Compression compression)
         {
             var fileNameWithoutExtension = Path.GetFileNameWithoutExtension(gifFile);
 
@@ -105,11 +106,11 @@ namespace Gif2CppConverter
 
             if (mode == OutputMode.Cpp)
             {
-                WriteCpp(writer, frameBytes, fileNameWithoutExtension, img, variableName);
+                WriteCpp(writer, frameBytes, fileNameWithoutExtension, img, variableName, compression);
             }
             else
             {
-                WriteBinary(writer, frameBytes);
+                WriteBinary(writer, frameBytes, compression);
             }
 
             writer.Close();
@@ -117,20 +118,39 @@ namespace Gif2CppConverter
 
         }
 
-        private static void WriteBinary(StreamWriter writer, List<List<int>> frameBytes)
+        private static void WriteBinary(StreamWriter writer, List<List<int>> frameBytes, Compression compression)
         {
-            for (int frameId = 0; frameId < frameBytes.Count; frameId++)
+            foreach (var currentFrame in frameBytes)
             {
-                var currentFrame = frameBytes[frameId];
-
-                foreach (var value in currentFrame)
+                for (var index = 0; index < currentFrame.Count; index++)
                 {
-                    writer.Write(value);
+                    var value = currentFrame[index];
+                    if (compression == Compression.None)
+                    {
+                        writer.Write(value);
+                    }
+
+                    if (compression == Compression.Forward)
+                    {
+                        var currentValue = currentFrame[index];
+
+                        var offset = 1;
+                        while (index + offset < currentFrame.Count && currentFrame[index + offset] == currentValue && offset < 16 * 16)
+                        {
+                            offset++;
+                        }
+
+                        index = index + offset - 1;
+
+                        writer.Write(offset);
+                        writer.Write(currentValue);
+                    }
                 }
             }
         }
 
-        private static void WriteCpp(StreamWriter writer, List<List<int>> frameBytes, String fileNameWithoutExtension, Image img, String variableName)
+        private static void WriteCpp(StreamWriter writer, List<List<int>> frameBytes, string fileNameWithoutExtension,
+            Image img, string variableName, Compression compression)
         {
             writer.WriteLine("#include <pgmspace.h>\n" +
                              $"// File '{fileNameWithoutExtension}.gif', Resolution: {img.Width}x{img.Height}px, Frames: {img.Frames.Count}\n" +
@@ -145,18 +165,46 @@ namespace Gif2CppConverter
                 for (var index = 0; index < currentFrame.Count; index++)
                 {
                     var value = currentFrame[index];
-                    writer.Write($"0x{value:x4}, ");
 
-                    if ((index + 1) % img.Width == 0)
+                    if (compression == Compression.None)
                     {
-                        writer.WriteLine();
+                        writer.Write($"0x{value:x4}, ");
+
+                        if ((index + 1) % img.Width == 0)
+                        {
+                            writer.WriteLine();
+                        }
                     }
+
+                    if (compression == Compression.Forward)
+                    {
+                        var currentValue = currentFrame[index];
+
+                        var offset = 1;
+                        while (index + offset < currentFrame.Count && currentFrame[index + offset] == currentValue && offset < 16 * 16)
+                        {
+                            offset++;
+                        }
+
+                        index = index + offset - 1;
+
+                        writer.Write($"0x{offset:x2}, ");
+                        writer.Write($"0x{value:x4}, ");
+                    }
+
+
                 }
             }
 
             writer.WriteLine("};");
 
         }
+    }
+
+    internal enum Compression
+    {
+        None,
+        Forward,
     }
 
     internal enum OutputMode
