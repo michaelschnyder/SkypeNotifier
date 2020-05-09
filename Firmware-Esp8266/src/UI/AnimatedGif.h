@@ -4,6 +4,8 @@
 #include <TFT_eSPI.h>
 #include <FS.h>
 
+#define SPIFFS_READ_BUFF_SIZE 512
+
 class AnimatedGif {
 
 public: 

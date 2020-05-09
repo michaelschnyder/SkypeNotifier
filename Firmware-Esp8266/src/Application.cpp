@@ -7,7 +7,7 @@ void Application::bootstrap() {
   startup.setTaskTimeoutInMs(5 * 1000);
   startup.setTaskRetryCount(10);
 
-  startup.addTask("Application is starting", [this](){ tft.init(); initializeFileSystem(); bootscreen.setup(&tft); });
+  startup.addTask("Application is starting", [this](){ tft.init(); bootscreen.setup(&tft); });
   startup.addTask("Setting up device",       [this](){ setGeneratedDeviceId(); });
   startup.addTask("Initialize File System",  [this](){ initializeFileSystem(); });
   startup.addTask("Load Configuration",      [this](){ config.load(); });
