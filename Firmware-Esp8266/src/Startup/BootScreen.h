@@ -2,6 +2,7 @@
 #define BootScreen_h
 
 #include <TFT_eSPI.h>
+#include <FS.h>
 #include "../UI/AnimatedGif.h"
 #include "../Colors.h"
 #include "../res/Resources.h"

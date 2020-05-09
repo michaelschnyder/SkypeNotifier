@@ -15,7 +15,7 @@ void BootScreen::setup(TFT_eSPI* tft) {
 
     spinner.init(tft);
     spinner.setPosition((160 - 32) / 2, SPINNER_Y);
-    spinner.setImage(spinner32, 32, 32);
+    spinner.setImage("/spinner-32.bin", 32, 32);
     spinner.setTotalFrames(60);
     spinner.start();
 

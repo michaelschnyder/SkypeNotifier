@@ -9,13 +9,13 @@ void StatusScreen::setup(TFT_eSPI* tft) {
 
     ringing.init(tft);
     ringing.setPosition((160 - 64) / 2, 20);
-    ringing.setImage(ringing64, 64, 64);
+    ringing.setImage("/ringing-64.bin", 64, 64);
     ringing.setTotalFrames(37);
 
 
     heartbeatMissing.init(tft);
     heartbeatMissing.setPosition((160 - 120) / 2, (128 - 90) / 2);
-    heartbeatMissing.setImage(heartbeatsingle120x90, 120, 90);
+    heartbeatMissing.setImage("/heartbeat-single-120x90.bin", 120, 90);
     heartbeatMissing.setTotalFrames(1);
     heartbeatMissing.setFramesPerSecond(1);
 
