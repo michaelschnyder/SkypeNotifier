@@ -72,7 +72,6 @@ namespace Gif2CppConverter
 
             var variableName = fileNameWithoutExtension.Replace("-", "");
 
-            using var writer = new StreamWriter(outFilePath);
             using var img = Image.Load(gifFile);
 
             Console.WriteLine($"Found {img.Frames.Count} in provided file.");
@@ -104,34 +103,46 @@ namespace Gif2CppConverter
 
             Console.WriteLine($"Writing output");
 
+
+
             if (mode == OutputMode.Cpp)
             {
+                using var writer = new StreamWriter(outFilePath);
                 WriteCpp(writer, frameBytes, fileNameWithoutExtension, img, variableName, compression);
+                writer.Close();
             }
             else
             {
+                using var writer = new BinaryWriter(new FileStream(outFilePath, FileMode.OpenOrCreate, FileAccess.Write));
+                
                 WriteBinary(writer, frameBytes, compression);
+                writer.Close();
             }
 
-            writer.Close();
             Console.WriteLine($"Writing output done");
 
         }
 
-        private static void WriteBinary(StreamWriter writer, List<List<int>> frameBytes, Compression compression)
+        private static void WriteBinary(BinaryWriter writer, List<List<int>> frameBytes, Compression compression)
         {
             foreach (var currentFrame in frameBytes)
             {
                 for (var index = 0; index < currentFrame.Count; index++)
                 {
-                    var value = currentFrame[index];
+                    var value = (ushort)currentFrame[index];
                     if (compression == Compression.None)
                     {
-                        writer.Write(value);
+                        var bytes = BitConverter.GetBytes(value);
+                        
+                        writer.Write(bytes[1]);
+                        writer.Write(bytes[0]);
+
+                        // writer.Write(value);
                     }
 
                     if (compression == Compression.Forward)
                     {
+                        // TODO
                         var currentValue = currentFrame[index];
 
                         var offset = 1;
@@ -188,7 +199,7 @@ namespace Gif2CppConverter
 
                         index = index + offset - 1;
 
-                        writer.Write($"0x{offset:x2}, ");
+                        writer.Write($"0x{offset:x}, ");
                         writer.Write($"0x{value:x4}, ");
                     }
 
