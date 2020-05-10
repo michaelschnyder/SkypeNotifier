@@ -18,6 +18,70 @@ namespace Gif2CppConverter
         Cpp
     }
 
+    class Program
+    {
+        static void Main(string[] args)
+        {
+            var path = args[0];
+            var outPath = args.Length > 1 ? args[1] : null;
+            var mode = args.Length > 2 && args[2] == "bin" ? OutputMode.Binary : OutputMode.Cpp;
+            var compression = args.Length > 3 ? Enum.Parse<Compression>(args[3]) : Compression.None;
+
+            var allFiles = new List<string>();
+
+            if (Directory.Exists(path))
+            {
+                if (outPath == null)
+                {
+                    outPath = path;
+                }
+
+                allFiles.AddRange(Directory.GetFiles(path, "*.gif"));
+            }
+            else if (File.Exists(path))
+            {
+                if (outPath == null)
+                {
+                    outPath = Path.GetDirectoryName(path);
+                }
+
+                allFiles.Add(path);
+            }
+
+            if (allFiles.Count == 0)
+            {
+                Console.WriteLine($"No file found at '{Path.GetFullPath(path)}'");
+            }
+
+            foreach (var file in allFiles)
+            {
+                ConvertFile(file, outPath, mode, compression);
+            }
+        }
+
+        private static void ConvertFile(string gifFile, string outPath, OutputMode mode, Compression compression)
+        {
+            using var img = Image.Load(gifFile);
+            var imageMetadata = new ImageMetadata(img.Width, img.Height, img.Frames.Count);
+
+            var frameBytes = GifToRgb16Reader.GetFrameBytes(img);
+
+            var fileNameWithoutExtension = Path.GetFileNameWithoutExtension(gifFile);
+            if (mode == OutputMode.Cpp)
+            {
+                var encoder = new HeaderFileEncoder();
+                encoder.Write(compression, outPath, frameBytes, fileNameWithoutExtension, imageMetadata);
+            }
+            else
+            {
+                var encoder = new BinaryEncoder();
+                encoder.WriteBinary(compression, outPath, frameBytes, fileNameWithoutExtension, imageMetadata);
+            }
+
+            Console.WriteLine($"Writing output done");
+        }
+    }
+
     class GifToRgb16Reader
     {
         private static int ToRgb16(int red, int green, int blue)
@@ -56,70 +120,6 @@ namespace Gif2CppConverter
 
             Console.WriteLine($"Writing output");
             return frameBytes;
-        }
-    }
-
-    class Program
-    {
-        static void Main(string[] args)
-        {
-            var path = args[0];
-            var outPath = args.Length > 1 ? args[1] : null;
-            var mode = args.Length > 2 && args[2] == "bin" ? OutputMode.Binary : OutputMode.Cpp;
-            var compression = args.Length > 3 ? Enum.Parse<Compression>(args[3]) : Compression.None;
-
-            var allFiles = new List<string>();
-
-            if (Directory.Exists(path))
-            {
-                if (outPath == null)
-                {
-                    outPath =path;
-                }
-
-                allFiles.AddRange(Directory.GetFiles(path, "*.gif"));
-            }
-            else if (File.Exists(path))
-            {
-                if (outPath == null)
-                {
-                    outPath = Path.GetDirectoryName(path);
-                }
-
-                allFiles.Add(path);
-            }
-
-            if (allFiles.Count == 0)
-            {
-                Console.WriteLine($"No file found at '{Path.GetFullPath(path)}'");
-            }
-
-            foreach (var file in allFiles)
-            {
-                ConvertFile(file, outPath, mode, compression);
-            }
-        }
-
-        private static void ConvertFile(string gifFile, string outPath, OutputMode mode, Compression compression)
-        {
-            using var img = Image.Load(gifFile);
-            var imageMetadata = new ImageMetadata(img.Width, img.Height, img.Frames.Count);
-
-            var frameBytes = GifToRgb16Reader.GetFrameBytes(img);
-
-            var fileNameWithoutExtension = Path.GetFileNameWithoutExtension(gifFile);
-            if (mode == OutputMode.Cpp)
-            {
-                var writer = new CppWriter();
-                writer.Write(compression, outPath, frameBytes, fileNameWithoutExtension, imageMetadata);
-            }
-            else
-            {
-                var writer = new BinWriter();
-                writer.WriteBinary(compression, outPath, frameBytes, fileNameWithoutExtension, imageMetadata);
-            }
-
-            Console.WriteLine($"Writing output done");
         }
     }
 }

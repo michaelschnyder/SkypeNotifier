@@ -4,7 +4,7 @@ using System.IO;
 
 namespace Gif2CppConverter
 {
-    class BinWriter
+    class BinaryEncoder
     {
         public void WriteBinary(Compression compression, string outPath, List<List<int>> frameBytes, string? fileNameWithoutExtension, ImageMetadata imageMetadata)
         {

@@ -3,7 +3,7 @@ using System.IO;
 
 namespace Gif2CppConverter
 {
-    class CppWriter
+    class HeaderFileEncoder
     {
         public void Write(Compression compression, string outPath,
             List<List<int>> frameBytes, string fileNameWithoutExtension, ImageMetadata imageMetadata)
