@@ -113,7 +113,7 @@ namespace Gif2CppConverter
             }
             else
             {
-                using var writer = new BinaryWriter(new FileStream(outFilePath, FileMode.OpenOrCreate, FileAccess.Write));
+                using var writer = new BinaryWriter(new FileStream(outFilePath, FileMode.Create, FileAccess.Write));
                 
                 WriteBinary(writer, frameBytes, compression);
                 writer.Close();
