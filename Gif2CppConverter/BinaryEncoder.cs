@@ -4,9 +4,16 @@ using System.IO;
 
 namespace Gif2CppConverter
 {
-    class BinaryEncoder
+    class BinaryEncoder : OutputEncoder
     {
-        public void WriteBinary(Compression compression, string outPath, List<List<int>> frameBytes, string? fileNameWithoutExtension, ImageMetadata imageMetadata)
+        private readonly Compression _compression;
+
+        public BinaryEncoder(Compression compression)
+        {
+            _compression = compression;
+        }
+
+        public override void Write(string outPath, List<List<int>> frameBytes, string? fileNameWithoutExtension, ImageMetadata imageMetadata)
         {
             var outFilePath = Path.Combine(outPath, $"{fileNameWithoutExtension}.bin");
 
@@ -19,7 +26,7 @@ namespace Gif2CppConverter
                     var value = (ushort)currentFrame[index];
                     var bytes = BitConverter.GetBytes(value);
 
-                    if (compression == Compression.RunLength)
+                    if (_compression == Compression.RunLength)
                     {
                         // TODO
                         var currentValue = currentFrame[index];

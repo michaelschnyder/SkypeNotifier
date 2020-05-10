@@ -3,10 +3,16 @@ using System.IO;
 
 namespace Gif2CppConverter
 {
-    class HeaderFileEncoder
+    class HeaderFileEncoder : OutputEncoder
     {
-        public void Write(Compression compression, string outPath,
-            List<List<int>> frameBytes, string fileNameWithoutExtension, ImageMetadata imageMetadata)
+        private readonly Compression _compression;
+
+        public HeaderFileEncoder(Compression compression)
+        {
+            _compression = compression;
+        }
+
+        public override void Write(string outPath, List<List<int>> frameBytes, string? fileNameWithoutExtension, ImageMetadata imageMetadata)
         {
             var outFilePath = Path.Combine(outPath, $"{fileNameWithoutExtension}.h");
 
@@ -27,7 +33,7 @@ namespace Gif2CppConverter
                 {
                     var value = currentFrame[index];
 
-                    if (compression == Compression.None)
+                    if (_compression == Compression.None)
                     {
                         writer.Write($"0x{value:x4}, ");
 
@@ -37,7 +43,7 @@ namespace Gif2CppConverter
                         }
                     }
 
-                    if (compression == Compression.RunLength)
+                    if (_compression == Compression.RunLength)
                     {
                         var currentValue = currentFrame[index];
 
