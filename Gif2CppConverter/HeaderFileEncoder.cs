@@ -12,7 +12,7 @@ namespace Gif2CppConverter
             _compression = compression;
         }
 
-        public override void Write(string outPath, List<List<int>> frameBytes, string? fileNameWithoutExtension, ImageMetadata imageMetadata)
+        public override void Write(List<List<int>> frameBytes, ImageMetadata imageMetadata, string outPath, string? fileNameWithoutExtension, int[] source)
         {
             var outFilePath = Path.Combine(outPath, $"{fileNameWithoutExtension}.h");
 
@@ -20,46 +20,55 @@ namespace Gif2CppConverter
             var variable = fileNameWithoutExtension.Replace("-", "");
 
             writer.WriteLine("#include <pgmspace.h>\n" +
-                             $"// File '{fileNameWithoutExtension}.gif', Resolution: {imageMetadata.ImgWidth}x{imageMetadata.ImgHeight}px, Frames: {imageMetadata.FramesCount}\n" +
+                             $"// Original file: {fileNameWithoutExtension}.gif \n" +
+                             $"// Compression:   {_compression}\n" +
+                             $"// Resolution:    {imageMetadata.ImgWidth}x{imageMetadata.ImgHeight}px, Frames: {imageMetadata.FramesCount}\n" +
                              $"const PROGMEM uint16_t {variable} [] = {{");
 
-            for (int frameId = 0; frameId < frameBytes.Count; frameId++)
+            if (_compression == Compression.None)
             {
-                writer.WriteLine();
-                writer.WriteLine("// Frame " + frameId);
-                var currentFrame = frameBytes[frameId];
+                var frameId = 0;
 
-                for (var index = 0; index < currentFrame.Count; index++)
+                for (var i = 0; i < source.Length; i++)
                 {
-                    var value = currentFrame[index];
-
-                    if (_compression == Compression.None)
+                    if (i % (imageMetadata.ImgWidth * imageMetadata.ImgHeight) == 0)
                     {
-                        writer.Write($"0x{value:x4}, ");
-
-                        if ((index + 1) % imageMetadata.ImgWidth == 0)
-                        {
-                            writer.WriteLine();
-                        }
+                        writer.WriteLine();
+                        writer.WriteLine("// Frame " + ++frameId);
                     }
 
-                    if (_compression == Compression.RunLength)
+                    writer.Write($"0x{source[i]:x4}, ");
+
+                    if ((i + 1 ) % imageMetadata.ImgWidth == 0)
                     {
-                        var currentValue = currentFrame[index];
+                        writer.WriteLine();
+                    }
+                }
+            }
+            else
+            {
+                var bytesWritten = 0;
+                for (var index = 0; index < source.Length; index++)
+                {
+                    var currentValue = source[index];
 
-                        var offset = 1;
-                        while (index + offset < currentFrame.Count && currentFrame[index + offset] == currentValue && offset < 16 * 16)
-                        {
-                            offset++;
-                        }
-
-                        index = index + offset - 1;
-
-                        writer.Write($"0x{offset:x}, ");
-                        writer.Write($"0x{value:x4}, ");
+                    var offset = 1;
+                    while (index + offset < source.Length && source[index + offset] == currentValue && offset < (16 * 16) - 1)
+                    {
+                        offset++;
                     }
 
+                    index = index + offset - 1;
 
+                    writer.Write($"0x{offset:x2}, ");
+                    writer.Write($"0x{currentValue:x4}, ");
+
+                    bytesWritten += 2;
+
+                    if (bytesWritten % 32 == 0)
+                    {
+                        writer.WriteLine();
+                    }
                 }
             }
 

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using SixLabors.ImageSharp;
 
 namespace Gif2CppConverter
@@ -84,7 +85,7 @@ namespace Gif2CppConverter
 
             var fileNameWithoutExtension = Path.GetFileNameWithoutExtension(gifFile);
 
-            encoder.Write(outPath, frameBytes, fileNameWithoutExtension, imageMetadata);
+            encoder.Write(frameBytes, imageMetadata, outPath, fileNameWithoutExtension, frameBytes.SelectMany(f => f).ToArray());
 
             Console.WriteLine($"Writing output done");
         }
