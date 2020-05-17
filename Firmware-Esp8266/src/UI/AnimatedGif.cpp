@@ -43,6 +43,8 @@ void AnimatedGif::setImage(String filename, uint32_t width, uint32_t height) {
     image = 0;
     AnimatedGif::filename = filename;
     file = SPIFFS.open(filename, "r");
+
+    reader = new BufferedReader(&file, SPIFFS_READ_BUFF_SIZE);
 }
 
 void AnimatedGif::refresh() {
@@ -92,22 +94,16 @@ void AnimatedGif::refresh() {
         
         if (!file) {
             file = SPIFFS.open(filename, "r");
+            reader = new BufferedReader(&file, SPIFFS_READ_BUFF_SIZE);
         }
 
         if (file.size() <= 0)  {
             return;
         }
 
-        for (k = 0; k < width * height; k += SPIFFS_READ_BUFF_SIZE / 2 ) {
-
-            char buff[SPIFFS_READ_BUFF_SIZE];
-            
-            file.readBytes(buff, SPIFFS_READ_BUFF_SIZE);
-
-            for(int i = 0; i < SPIFFS_READ_BUFF_SIZE; i += 2) {
-                uint16_t color = (buff[i] << 8) + buff[i+1];
-                tft->pushColor(color);
-            }
+        for (k = 0; k < width * height; k++ ) {
+            uint16_t color = reader->readWord();
+            tft->pushColor(color);
         }
     }
 

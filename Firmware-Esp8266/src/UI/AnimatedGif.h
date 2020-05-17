@@ -3,6 +3,7 @@
 
 #include <TFT_eSPI.h>
 #include <FS.h>
+#include <BufferedReader.h>
 
 #define SPIFFS_READ_BUFF_SIZE 512
 
@@ -25,6 +26,7 @@ private:
     const uint16_t * image;
     String filename;
     fs::File file;
+    BufferedReader *reader;
 
     uint32_t x;
     uint32_t y;
