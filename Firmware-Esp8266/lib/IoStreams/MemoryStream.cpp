@@ -29,10 +29,20 @@ int MemoryStream::read() {
 	return ret;
   }
 }
+size_t MemoryStream::readBytes(char *buffer, size_t length) {
+	
+	if (size == 0) {
+		return -1;
+	}
 
-// size_t readBytes(char *buffer, size_t length) {
-// 	return -1;
-// }
+	size_t len = length > size ? size : length;
+	memcpy(buffer, &MemoryStream::buffer[pos], sizeof(MemoryStream::buffer[0])*len);
+	
+	pos+=len;
+	size-=len;
+	
+	return len;
+}
 
 size_t MemoryStream::write(uint8_t v) {
   if (size == buffer_size) {
