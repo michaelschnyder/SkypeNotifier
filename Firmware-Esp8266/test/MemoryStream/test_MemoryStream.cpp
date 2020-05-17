@@ -32,16 +32,33 @@ void multiple_bytes_can_be_read(void) {
     TEST_ASSERT_EQUAL(0xfb, buff[2]);
 }
 
-void multiple_bytes_increase_position() {
+void multiple_read_multiple_starts_at_position() {
+    MemoryStream* memStream = new MemoryStream(10);
+    memStream->write(0xfa);
+    memStream->write(0xfb);
+    memStream->write(0xfc);
+    memStream->write(0xfd);
+
+    char buff[2];
+    memStream->readBytes(&buff[0], 2);
+    memStream->readBytes(&buff[0], 2);
+
+    TEST_ASSERT_EQUAL(0xfc, buff[0]);
+}
+
+void singlebyte_read_multiple_starts_at_position() {
     MemoryStream* memStream = new MemoryStream(10);
     memStream->write(0xfa);
     memStream->write(0xfb);
     memStream->write(0xfc);
 
+    memStream->read();
+    memStream->read();
+
     char buff[2];
     memStream->readBytes(&buff[0], 2);
 
-    TEST_ASSERT_EQUAL(0xfc, memStream->read());
+    TEST_ASSERT_EQUAL(0xfc, buff[0]);
 }
 
 void cast_virtual_readByte(void) {
@@ -71,7 +88,8 @@ void process() {
     RUN_TEST(multiple_bytes_can_be_read);
     RUN_TEST(cast_virtual_readByte);
     RUN_TEST(cast_virtual_readBytes);
-    RUN_TEST(multiple_bytes_increase_position);
+    RUN_TEST(multiple_read_multiple_starts_at_position);
+    RUN_TEST(singlebyte_read_multiple_starts_at_position);
     UNITY_END();
 }
 

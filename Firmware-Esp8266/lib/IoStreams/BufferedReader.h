@@ -14,6 +14,7 @@ public:
 
     BufferedReader(Stream *in, size_t buffer_size = BufferedReader::DEFAULT_SIZE);
     uint8_t readByte();
+    uint16_t readWord();
 
 private:
     size_t bufferSize = DEFAULT_SIZE;

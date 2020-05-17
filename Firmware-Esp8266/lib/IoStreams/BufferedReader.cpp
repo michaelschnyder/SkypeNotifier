@@ -18,3 +18,11 @@ uint8_t BufferedReader::readByte() {
     pos++;
     return retVal;
 }
+
+uint16_t BufferedReader::readWord() {
+    
+    uint8_t byte0 = readByte();
+    uint8_t byte1 = readByte();
+
+    return (byte0 << 8) + byte1;
+}
