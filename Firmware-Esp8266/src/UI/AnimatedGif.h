@@ -4,6 +4,7 @@
 #include <TFT_eSPI.h>
 #include <FS.h>
 #include <BufferedReader.h>
+#include <ProgMemReader.h>
 
 #define SPIFFS_READ_BUFF_SIZE 512
 
@@ -23,10 +24,11 @@ public:
 private:
     TFT_eSPI * tft;
 
-    const uint16_t * image;
     String filename;
     fs::File file;
-    BufferedReader *reader;
+    
+    bool isSourceReady = false;
+    Reader *reader = NULL;
 
     uint32_t x;
     uint32_t y;
@@ -34,11 +36,11 @@ private:
     uint32_t width;
     uint32_t height;
 
-    bool isReady;
+    bool isVisible;
+    bool isRunning;
     long currentFrame;
-    uint64_t frameOffset;
 
-    long msPerFrame;
+    unsigned long msPerFrame;
 
     unsigned long lastUpdated;
     long numberOfFrames = 0;
