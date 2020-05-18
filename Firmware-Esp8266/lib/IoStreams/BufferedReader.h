@@ -31,10 +31,10 @@ public:
     void restart();
 
 private:
-    size_t bufferSize;
-    uint8_t* buffer = NULL;
     bool hasBufferData = false;
     uint16_t pos = 0;
     StreamTypeEnum streamType;
     Stream *inputStream;
+    size_t bufferSize;
+    uint8_t* buffer = NULL;
 };
