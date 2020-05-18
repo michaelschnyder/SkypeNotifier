@@ -7,7 +7,9 @@
 #include <StreamFake.h>
 #endif
 
-class BufferedReader {
+#include "Reader.h"
+
+class BufferedReader : public Reader {
 
 public:
     static const size_t DEFAULT_SIZE = 64;

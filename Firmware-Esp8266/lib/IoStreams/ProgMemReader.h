@@ -1,6 +1,8 @@
 #include <pgmspace.h>
 
-class ProgMemReader {
+#include "Reader.h"
+
+class ProgMemReader : public Reader {
 
 public:
     ProgMemReader(const uint16_t * addr);

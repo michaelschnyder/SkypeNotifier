@@ -54,6 +54,14 @@ void small_buffer_multiple_reads() {
     TEST_ASSERT_EQUAL(0xfc, reader->readByte());
 }
 
+void access_as_reader_works() {
+    memStream = new MemoryStream(4);
+    memStream->write(0xfa);
+
+    Reader* reader = new BufferedReader(memStream, 1);
+    TEST_ASSERT_EQUAL(0xfa, reader->readByte());
+}
+
 void infrastruture_setup_test(void) {
     TEST_ASSERT_EQUAL(1, 1);
 }
@@ -64,6 +72,7 @@ void process() {
     RUN_TEST(singlebyte_can_be_read);
     RUN_TEST(multiple_bytes_can_be_read);
     RUN_TEST(small_buffer_multiple_reads);
+    RUN_TEST(access_as_reader_works);
     UNITY_END();
 }
 

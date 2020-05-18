@@ -10,19 +10,24 @@ const PROGMEM uint16_t ProgMemByteAddrLocation [] = { 0xfa, 0xfb, 0xfc, 0xfd };
 #endif
 
 void word_read(void) {
-    ProgMemReader* stream = new ProgMemReader(ProgMemWordAddrLocation);
-    TEST_ASSERT_EQUAL(0xfafa, stream->readWord());
-    TEST_ASSERT_EQUAL(0xfbfb, stream->readWord());
-    TEST_ASSERT_EQUAL(0xfcfc, stream->readWord());
-    TEST_ASSERT_EQUAL(0xfdfd, stream->readWord());
+    ProgMemReader* reader = new ProgMemReader(ProgMemWordAddrLocation);
+    TEST_ASSERT_EQUAL(0xfafa, reader->readWord());
+    TEST_ASSERT_EQUAL(0xfbfb, reader->readWord());
+    TEST_ASSERT_EQUAL(0xfcfc, reader->readWord());
+    TEST_ASSERT_EQUAL(0xfdfd, reader->readWord());
 }
 
 void word_byte(void) {
-    ProgMemReader* stream = new ProgMemReader(ProgMemByteAddrLocation);
-    TEST_ASSERT_EQUAL(0xfa, stream->readByte());
-    TEST_ASSERT_EQUAL(0xfb, stream->readByte());
-    TEST_ASSERT_EQUAL(0xfc, stream->readByte());
-    TEST_ASSERT_EQUAL(0xfd, stream->readByte());
+    ProgMemReader* reader = new ProgMemReader(ProgMemByteAddrLocation);
+    TEST_ASSERT_EQUAL(0xfa, reader->readByte());
+    TEST_ASSERT_EQUAL(0xfb, reader->readByte());
+    TEST_ASSERT_EQUAL(0xfc, reader->readByte());
+    TEST_ASSERT_EQUAL(0xfd, reader->readByte());
+}
+
+void access_as_reader_works() {
+    Reader* reader = new ProgMemReader(ProgMemByteAddrLocation);
+    TEST_ASSERT_EQUAL(0xfa, reader->readByte());
 }
 
 void process() {
