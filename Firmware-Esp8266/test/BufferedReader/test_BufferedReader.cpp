@@ -54,6 +54,37 @@ void small_buffer_multiple_reads() {
     TEST_ASSERT_EQUAL(0xfc, reader->readByte());
 }
 
+void small_buffer_dont_overcopy() {
+    memStream = new MemoryStream(4);
+    memStream->write(0xfa);
+    memStream->write(0xfb);
+
+    BufferedReader *reader = new BufferedReader(memStream, 2);
+
+    // read through first buffered size
+    TEST_ASSERT_EQUAL(0xfa, reader->readByte());
+    TEST_ASSERT_EQUAL(0xfb, reader->readByte());
+
+    // Did the buffer refresh?
+    memStream->write(0xfc);
+    TEST_ASSERT_EQUAL(0xfc, reader->readByte());
+}
+
+void when_restart_start_beginning() {
+    memStream = new MemoryStream(16);
+    memStream->write(0xfa);
+    memStream->write(0xfb);
+
+    Reader* reader = new BufferedReader(memStream, 2);
+    reader->readByte();
+    reader->readByte();
+
+    reader->restart();
+
+    TEST_ASSERT_EQUAL(0xfa, reader->readByte());
+    TEST_ASSERT_EQUAL(0xfb, reader->readByte());
+}
+
 void access_as_reader_works() {
     memStream = new MemoryStream(4);
     memStream->write(0xfa);
@@ -72,6 +103,8 @@ void process() {
     RUN_TEST(singlebyte_can_be_read);
     RUN_TEST(multiple_bytes_can_be_read);
     RUN_TEST(small_buffer_multiple_reads);
+    RUN_TEST(small_buffer_dont_overcopy);
+    RUN_TEST(when_restart_start_beginning);
     RUN_TEST(access_as_reader_works);
     UNITY_END();
 }

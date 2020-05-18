@@ -30,10 +30,20 @@ void access_as_reader_works() {
     TEST_ASSERT_EQUAL(0xfa, reader->readByte());
 }
 
+void when_restart_start_beginning() {
+    Reader* reader = new ProgMemReader(ProgMemByteAddrLocation);
+    reader->readByte();
+    reader->restart();
+
+    TEST_ASSERT_EQUAL(0xfa, reader->readByte());
+}
+
 void process() {
     UNITY_BEGIN();
     RUN_TEST(word_read);
     RUN_TEST(word_byte);
+    RUN_TEST(when_restart_start_beginning);
+    RUN_TEST(access_as_reader_works);
     UNITY_END();
 }
 

@@ -8,6 +8,7 @@ public:
     ProgMemReader(const uint16_t * addr);
     uint8_t readByte();
     uint16_t readWord();
+    void restart();
 
 private:
     const uint16_t * baseAddr;

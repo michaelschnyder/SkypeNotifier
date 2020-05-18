@@ -25,11 +25,7 @@ public:
     virtual int read();
     virtual size_t readBytes(char *buffer, size_t length);
 
-    // virtual size_t readBytes(char *buffer, size_t length); // read chars from stream into buffer
-    // virtual size_t readBytes(uint8_t *buffer, size_t length) {
-    //     return readBytes((char *) buffer, length);
-    // }
-
     virtual int peek();
     virtual void flush();
+    bool seek(uint32_t pos);
 };

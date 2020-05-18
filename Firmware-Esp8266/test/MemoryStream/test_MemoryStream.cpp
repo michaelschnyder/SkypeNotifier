@@ -17,6 +17,15 @@ void singlebyte_can_be_read(void) {
     TEST_ASSERT_EQUAL(0xff, memStream->read());
 }
 
+void singlebyte_can_be_read_continous(void) {
+    MemoryStream* memStream = new MemoryStream(2);
+    memStream->write(0xfa);
+    memStream->write(0xfb);
+
+    TEST_ASSERT_EQUAL(0xfa, memStream->read());
+    TEST_ASSERT_EQUAL(0xfb, memStream->read());
+}
+
 void multiple_bytes_can_be_read(void) {
     MemoryStream* memStream = new MemoryStream(10);
     memStream->write(0xff);
@@ -61,6 +70,18 @@ void singlebyte_read_multiple_starts_at_position() {
     TEST_ASSERT_EQUAL(0xfc, buff[0]);
 }
 
+void seek_read_again() {
+
+    MemoryStream* memStream = new MemoryStream(10);
+    memStream->write(0xfa);
+    memStream->write(0xfb);
+
+    memStream->read();
+    memStream->seek(0);
+
+    TEST_ASSERT_EQUAL(0xfa, memStream->read());
+}
+
 void cast_virtual_readByte(void) {
 
     Stream* stream = new MemoryStream(10);
@@ -85,9 +106,11 @@ void cast_virtual_readBytes(void) {
 void process() {
     UNITY_BEGIN();
     RUN_TEST(singlebyte_can_be_read);
+    RUN_TEST(singlebyte_can_be_read_continous);
     RUN_TEST(multiple_bytes_can_be_read);
     RUN_TEST(cast_virtual_readByte);
     RUN_TEST(cast_virtual_readBytes);
+    RUN_TEST(seek_read_again);
     RUN_TEST(multiple_read_multiple_starts_at_position);
     RUN_TEST(singlebyte_read_multiple_starts_at_position);
     UNITY_END();

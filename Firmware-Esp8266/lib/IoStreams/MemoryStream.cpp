@@ -73,3 +73,15 @@ int MemoryStream::peek() {
 
 void MemoryStream::flush() {
 }
+
+bool MemoryStream::seek(uint32_t position) {
+	
+	if (position >= 0 && position < buffer_size) {
+		this->pos = position;
+		return true;
+	}
+
+	return false;
+}
+
+

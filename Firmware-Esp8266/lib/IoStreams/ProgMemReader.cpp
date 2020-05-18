@@ -11,3 +11,7 @@ uint16_t ProgMemReader::readWord() {
 uint8_t ProgMemReader::readByte() {
     return pgm_read_word(baseAddr + pos++);
 }
+
+void ProgMemReader::restart() {
+    pos = 0;
+}
