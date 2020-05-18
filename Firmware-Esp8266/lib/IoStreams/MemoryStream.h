@@ -1,3 +1,6 @@
+#if !defined(MemoryStream_h)
+#define MemoryStream_h
+
 #include <Arduino.h>
 
 #ifdef ARDUINO
@@ -29,3 +32,5 @@ public:
     virtual void flush();
     bool seek(uint32_t pos);
 };
+
+#endif // MemoryStream_h

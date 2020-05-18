@@ -70,7 +70,7 @@ void small_buffer_dont_overcopy() {
     TEST_ASSERT_EQUAL(0xfc, reader->readByte());
 }
 
-void when_restart_start_beginning() {
+void restart_start_from_beginning() {
     memStream = new MemoryStream(16);
     memStream->write(0xfa);
     memStream->write(0xfb);
@@ -106,7 +106,7 @@ void process() {
     RUN_TEST(multiple_bytes_can_be_read);
     RUN_TEST(small_buffer_multiple_reads);
     RUN_TEST(small_buffer_dont_overcopy);
-    RUN_TEST(when_restart_start_beginning);
+    RUN_TEST(restart_start_from_beginning);
     RUN_TEST(access_as_reader_works);
     UNITY_END();
 }
