@@ -74,6 +74,8 @@ void when_restart_start_beginning() {
     memStream = new MemoryStream(16);
     memStream->write(0xfa);
     memStream->write(0xfb);
+    memStream->write(0xfc);
+    memStream->write(0xfd);
 
     Reader* reader = new BufferedReader(memStream, 2);
     reader->readByte();
