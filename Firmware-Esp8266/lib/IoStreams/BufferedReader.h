@@ -12,12 +12,6 @@
 #include <FS.h>
 
 
-enum StreamTypeEnum {
-    Unknown,
-    Memory,
-    File
-};
-
 class BufferedReader : public Reader {
 
 public:
